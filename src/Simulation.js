@@ -134,7 +134,8 @@ class Simulation {
       rndFinEstacionamientoActual: 0,
       tiempoDeLlegada: 0,
       tiempoDeOcurrenciaFinEstacionamientoActual: 0,
-      autosFinEstacionamiento: []
+      autosFinEstacionamiento: [],
+      rndProximoFinEstacionamiento:0,
     };
 
     this.inicializarEventos(datos);
@@ -219,6 +220,7 @@ class Simulation {
         tiempoDeOcurrenciaFinEstacionamientoActual: eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual,
         tiempoDeLlegada: eventoProximo.tiempoDeLlegada,
         nroFila: fila,
+        rndProximoFinEstacionamiento:eventoProximo.rndProximoFinEstacionamiento,
 
       };
 
@@ -227,7 +229,7 @@ class Simulation {
 
       //Valores proximo fin de estacionamiento
       filaDatos.tiempoActual=eventoProximo.tiempoActual;
-      filaDatos.rndTiempoProxFinEstacionamiento = eventoProximo.rndTiempoProxFinEstacionamiento;
+      filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndTiempoProxFinEstacionamiento ;
       filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadiaProxFinEstacionamiento;
       //CHEQUEAR TIEMPO DE OCURRENCIA
       filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
@@ -245,14 +247,14 @@ class Simulation {
 
         //crea EventoFinEstacionamiento
       
-        filaDatos.rndFinEstacionamientoActual = eventoProximo.rndFinEstacionamientoActual;
+        filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
         filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadiaActual;
         filaDatos.tiempoDeLlegada = eventoProximo.tiempoDeLlegada;
         filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
         
       }
     
-
+console.log("RND ESTAC", filaDatos.rndFinEstacionamientoActual)
       if (eventoProximo instanceof EventoFinEstacionamiento) {
 
         //Valores proximo fin de estacionamiento
@@ -333,7 +335,7 @@ class EventoInicializacion {
 
   ocurreEvento(datos) {
     datos.colaEventos.push(new EventoLlegadaAuto(this.rndLlegada,this.tiempoEntreLlegadas,this.proximaLlegada, datos.nroAuto + 1));
-    console.log("EVENTO", this.rndLlegada)
+
   };
 
 }
