@@ -38,11 +38,11 @@ const DataTable = ({ data,variableEstadistica }) => {
                   <td>{row.evento}</td>
                   <td>{JSON.stringify(row.nroAuto)}</td>
                   <td>{row.tiempoActual}</td>
-                  <th>{row.rndTamano}</th>
-                  <td>{row.tamano}</td>
-                  <th>{row.rndLlegada}</th>
-                  <td>{row.tiempoEntreLlegadas}</td>
-                  <td>{row.proximaLlegada}</td>
+                  <th>{row.rndTamanoActual}</th>
+                  <td>{row.tamanoActual}</td>
+                  <th>{row.rndProximaLlegada}</th>
+                  <td>{row.ProximotiempoEntreLlegadas}</td>
+                  <td>{JSON.stringify(row.proximaLlegada)}</td>
                   <th>{row.rndEstacionamiento}</th>
                   <td>{row.tEstacionamiento}</td>
                   <td>{row.finEstacionamiento}</td>
