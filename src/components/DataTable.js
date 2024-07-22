@@ -10,7 +10,7 @@ const DataTable = ({ data,variableEstadistica }) => {
                 <th>Evento</th>
                 <th>N auto</th>
                 <th>Tiempo</th>
-                <th>RND tanano</th>
+                <th>RND tamano</th>
                 <th>Tamano vehiculo</th>
                 <th>RND t. llegada</th>
                 <th>T. entre llegadas</th>
