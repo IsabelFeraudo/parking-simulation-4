@@ -266,8 +266,8 @@ class Simulation {
 
        if (eventoProximo instanceof EventoInicializacion) {
         filaDatos.tiempoActual=datos.tiempoActual;
-         filaDatos.tiempoEntreLlegadas = eventoProximo.tiempoEntreLlegadas;
-         filaDatos.rndLlegada = eventoProximo.rndLlegada;
+         filaDatos.ProximotiempoEntreLlegadas = eventoProximo.tiempoEntreLlegadas;
+         filaDatos.rndProximaLlegada = eventoProximo.rndLlegada;
          filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
        }
 
@@ -423,7 +423,7 @@ class EventoLlegadaAuto {
     }
   });
 
-      datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadia, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
+      datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
 
     datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeOcurrencia));
@@ -469,6 +469,7 @@ class EventoFinEstacionamiento {
     this.tiempoDeEstadiaActual = tiempoDeEstadiaActual;
     this.tiempoDeLlegada = tiempoDeLlegada;
     this.tiempoDeOcurrenciaFinEstacionamientoActual = tiempoDeOcurrenciaFinEstacionamientoActual;
+    this.tiempoDeOcurrencia = this.tiempoDeOcurrenciaFinEstacionamientoActual
     this.auto = autoQueLlega;
     autoQueLlega.costo = calcularCostoEstadia(this.tiempoDeEstadiaActual, autoQueLlega.tamanoActual);
   }
@@ -496,19 +497,13 @@ class EventoFinEstacionamiento {
       }
     }
 
-    // Agregar el auto a autosFinEstacionamiento
-    datos.autosFinEstacionamiento.push({
-      tiempoDeEstadiaActual: this.tiempoDeEstadiaActual,
-      tiempoDeLlegada: this.tiempoDeLlegada,
-      tiempoDeOcurrenciaFinEstacionamientoActual: this.tiempoDeOcurrenciaFinEstacionamientoActual,
-      auto: {
-        nro: this.auto.nro,
-        estado: this.auto.estado,
-        tamanoActual: this.auto.tamanoActual
-      }
-    });
+    // Eliminar el auto de autosFinEstacionamiento
+    datos.autosFinEstacionamiento = datos.autosFinEstacionamiento.filter(autoFin => autoFin.auto.nro !== this.auto.nro);
+
+
   }
 }
+
 
 
 class EventoFinCobro {

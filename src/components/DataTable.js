@@ -47,15 +47,17 @@ const DataTable = ({ data,variableEstadistica }) => {
                   <th>{row.rndProximoFinEstacionamiento}</th>
                   <td>{row.tiempoDeEstadiaProxFinEstacionamiento}</td>
                   <td>
-                    {row.autosFinEstacionamiento.map((finEstacionamiento, idx) => (
-                      <div key={idx}>
-                        <p>Auto: {finEstacionamiento.auto.nro}</p>
-                        <p>T. Estadia: {finEstacionamiento.tiempoDeEstadiaActual}</p>
-                        <p>T. Llegada: {finEstacionamiento.tiempoDeLlegada}</p>
-                        <p>Fin Estacionamiento: {finEstacionamiento.tiempoDeOcurrenciaFinEstacionamientoActual}</p>
-                      </div>
-                    ))}
-                  </td>
+  {row.autosFinEstacionamiento.map((finEstacionamiento, idx) => (
+    <div key={idx}>
+      <p>
+        Auto: {finEstacionamiento.auto.nro}, 
+        T. Estadia: {finEstacionamiento.tiempoDeEstadiaActual.toFixed(2)}, 
+        T. Llegada: {finEstacionamiento.tiempoDeLlegada.toFixed(2)}, 
+        Fin Estacionamiento: {finEstacionamiento.tiempoDeOcurrenciaFinEstacionamientoActual.toFixed(2)}
+      </p>
+    </div>
+  ))}
+</td>
                   <th>{row.tCobro}</th>
                   <td>{row.finCobro}</td>
                   <td>{JSON.stringify(row.estadoCajero)}</td>
