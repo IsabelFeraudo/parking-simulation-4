@@ -319,19 +319,25 @@ function tamanoActualDeAuto(random) {
   }
 }
 
+function insertarEvento(eventosCola, nuevoEvento) {
+  // Insertar el nuevo evento en la cola
+  eventosCola.push(nuevoEvento);
+  
+  // Ordenar la cola de eventos por tiempo de ocurrencia
+  eventosCola.sort((a, b) => a.tiempoDeOcurrencia - b.tiempoDeOcurrencia);
+}
+
 class EventoInicializacion {
-  constructor() {
-    this.tiempoDeOcurrencia = 0
-    this.rndLlegada = Math.random();
-    this.tiempoEntreLlegadas = 12 + this.rndLlegada * (14 - 12);
-    this.proximaLlegada = this.tiempoDeOcurrencia + this.tiempoEntreLlegadas;
-  }
+constructor(tiempoActual) {
+  this.tiempoDeOcurrencia = 0;
+  this.rndLlegada = Math.random();
+  this.tiempoEntreLlegadas = 12 + this.rndLlegada * (14 - 12);
+  this.proximaLlegada = tiempoActual + this.tiempoEntreLlegadas;
+}
 
-  ocurreEvento(datos) {
-    datos.colaEventos.push(new EventoLlegadaAuto(this.rndLlegada,this.tiempoEntreLlegadas,this.proximaLlegada, datos.nroAuto + 1));
-
-  };
-
+ocurreEvento(datos) {
+  insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.proximaLlegada));
+}
 }
 
 
