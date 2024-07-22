@@ -230,8 +230,12 @@ class Simulation {
         filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
         filaDatos.nroAuto = eventoProximo.auto.nro; // Obtener el número de auto
       
+        // Evento cobro
+        filaDatos.tCobro = 2; // Asumiendo que tCobro es una constante
+        filaDatos.finCobro = eventoProximo.finCobro; // Obtener el tiempo de cobro
         console.log("TIEMPO:", filaDatos.tiempoDeOcurrenciaFinEstacionamiento);
         console.log("NRO AUTO:", filaDatos.nroAuto);
+        console.log("FIN COBRO:", filaDatos.finCobro);
       }
       
       
@@ -475,9 +479,10 @@ class EventoFinEstacionamiento {
     this.tiempoDeEstadiaActual = tiempoDeEstadiaActual;
     this.tiempoDeLlegada = tiempoDeLlegada;
     this.tiempoDeOcurrenciaFinEstacionamientoActual = tiempoDeOcurrenciaFinEstacionamientoActual;
-    this.tiempoDeOcurrencia = this.tiempoDeOcurrenciaFinEstacionamientoActual
     this.auto = autoQueLlega;
-    autoQueLlega.costo = calcularCostoEstadia(this.tiempoDeEstadiaActual, autoQueLlega.tamanoActual);
+    
+    // Calcular el tiempo de cobro
+    this.finCobro = this.tiempoDeOcurrenciaFinEstacionamientoActual + 2; // Por ejemplo, 2 unidades de tiempo después del fin de estacionamiento
   }
 
   ocurreEvento(datos) {
@@ -505,8 +510,6 @@ class EventoFinEstacionamiento {
 
     // Eliminar el auto de autosFinEstacionamiento
     datos.autosFinEstacionamiento = datos.autosFinEstacionamiento.filter(autoFin => autoFin.auto.nro !== this.auto.nro);
-
-
   }
 }
 
