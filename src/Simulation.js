@@ -248,7 +248,7 @@ class Simulation {
         //crea EventoFinEstacionamiento
       
         filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
-        filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadiaActual;
+        filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadia;
         filaDatos.tiempoDeLlegada = eventoProximo.tiempoDeLlegada;
         filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
         
