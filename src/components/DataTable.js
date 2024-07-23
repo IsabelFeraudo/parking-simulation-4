@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Container } from 'react-bootstrap';
 
-const DataTable = ({ data,variableEstadistica }) => {
+const DataTable = ({ data, variableEstadistica }) => {
     return (
         <div className="container">
           <Table className="table table-striped">
@@ -23,8 +23,6 @@ const DataTable = ({ data,variableEstadistica }) => {
                 <th>Estado Cajero</th>
                 <th>Fila en Caja</th>
                 <th>Autos Ingresados</th>
-                {/* <th>Lugares Utilitarios Parcialmente Libres</th> */}
-                
                 <th>Lugares Utilitarios Libres</th>
                 <th>Lugares Grandes Libres</th>
                 <th>Lugares Pequeños Libres</th>
@@ -47,24 +45,22 @@ const DataTable = ({ data,variableEstadistica }) => {
                   <th>{row.rndProximoFinEstacionamiento}</th>
                   <td>{row.tiempoDeEstadiaProxFinEstacionamiento}</td>
                   <td>
-  {row.autosFinEstacionamiento.map((finEstacionamiento, idx) => (
-    <div key={idx}>
-      <p>
-        Auto: {finEstacionamiento.auto.nro}, 
-        T. Estadia: {finEstacionamiento.tiempoDeEstadiaActual.toFixed(2)}, 
-        T. Llegada: {finEstacionamiento.tiempoDeLlegada.toFixed(2)}, 
-        Fin Estacionamiento: {finEstacionamiento.tiempoDeOcurrenciaFinEstacionamientoActual.toFixed(2)}
-      </p>
-    </div>
-  ))}
-</td>
+                    {row.autosFinEstacionamiento.map((finEstacionamiento, idx) => (
+                      <div key={idx}>
+                        <p>
+                          Auto: {finEstacionamiento.auto.nro}, 
+                          T. Estadia: {finEstacionamiento.tiempoDeEstadiaActual?.toFixed(2)}, 
+                          T. Llegada: {finEstacionamiento.tiempoDeLlegada?.toFixed(2)}, 
+                          Fin Estacionamiento: {finEstacionamiento.tiempoDeOcurrenciaFinEstacionamientoActual?.toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </td>
                   <th>{row.tCobro}</th>
                   <td>{row.finCobro}</td>
                   <td>{JSON.stringify(row.estadoCajero)}</td>
                   <td>{JSON.stringify(row.filaCaja)}</td>   
                   <td>{row.cantAutosIngresados}</td>    
-                  {/* <td>{row.utilitariosParcialmenteLibres}</td> */}
-                  
                   <td>{row.utilitariosLibres}</td>
                   <td>{row.grandesLibres}</td>
                   <td>{row.pequeñosLibres}</td>
@@ -77,6 +73,6 @@ const DataTable = ({ data,variableEstadistica }) => {
           </Table>
         </div>
       );
-    };
+};
 
 export default DataTable;
