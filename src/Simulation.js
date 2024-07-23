@@ -435,6 +435,7 @@ class EventoLlegadaAuto {
       tamanoActual: this.auto.tamanoActual
     }
   });
+  console.log("TIEMPO ESTACIONAMIENTO",this.tiempoDeOcurrenciaFinEstacionamiento)
 
       datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
@@ -483,6 +484,7 @@ class EventoFinEstacionamiento {
     this.tiempoDeLlegada = tiempoDeLlegada;
     this.tiempoDeOcurrenciaFinEstacionamientoActual = tiempoDeOcurrenciaFinEstacionamientoActual;
     this.auto = autoQueLlega;
+    this.tiempoDeOcurrencia= this.tiempoDeOcurrenciaFinEstacionamientoActual;
     
     // Calcular el tiempo de cobro
     this.finCobro = this.tiempoDeOcurrenciaFinEstacionamientoActual + 2; // Por ejemplo, 2 unidades de tiempo después del fin de estacionamiento
