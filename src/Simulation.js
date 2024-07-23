@@ -272,6 +272,12 @@ class Simulation {
          filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
        }
 
+       if (eventoProximo instanceof EventoFinCobro) {
+        filaDatos.tiempoActual=eventoProximo.tiempoDeOcurrenciaFinCobro;
+        filaDatos.tCobro = 2;
+        filaDatos.finCobro=eventoProximo.tiempoProximaOcurrenciaFinCobro;
+       }
+
       console.log("hasta aca fila", filaDatos);
 
       if (fila >= this.FILA_A_SIMULAR_DESDE && fila < this.FILA_A_SIMULAR_DESDE + this.CANTIDAD_FILAS_A_MOSTRAR) {
@@ -485,7 +491,7 @@ class EventoFinEstacionamiento {
     this.tiempoDeOcurrencia= this.tiempoDeOcurrenciaFinEstacionamientoActual;
     
     // Calcular el tiempo de cobro
-    this.finCobro = this.tiempoDeOcurrenciaFinEstacionamientoActual + 2; // Por ejemplo, 2 unidades de tiempo después del fin de estacionamiento
+    this.finCobro = this.tiempoDeOcurrencia + 2; // Por ejemplo, 2 unidades de tiempo después del fin de estacionamiento
   }
 
   ocurreEvento(datos) {
@@ -507,7 +513,7 @@ class EventoFinEstacionamiento {
       } else {
         this.auto.estado = 'pagando';
         datos.cajaOcupada = true;
-        datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrenciaFinEstacionamientoActual, this.auto));
+        datos.colaEventos.push(new EventoFinCobro(this.finCobro, this.auto));
       }
     }
 
@@ -520,7 +526,9 @@ class EventoFinEstacionamiento {
 
 class EventoFinCobro {
   constructor(tiempoActual, auto) {
-    this.tiempoDeOcurrencia = tiempoActual + 2
+    this.tiempoDeOcurrencia=tiempoActual;
+    this.tiempoDeOcurrenciaFinCobro=this.tiempoDeOcurrencia;
+    this.tiempoProximaOcurrenciaFinCobro = tiempoActual + 2
     this.auto = auto
   }
 
@@ -538,7 +546,7 @@ class EventoFinCobro {
     if (datos.filaCaja.length > 0) {
       const proximoAuto = datos.filaCaja.shift() // saca el primero de la fila
 
-      datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrencia, proximoAuto))
+      datos.colaEventos.push(new EventoFinCobro(this.tiempoProximaOcurrencia, proximoAuto))
     } else {
       datos.cajaOcupada = false
     }
