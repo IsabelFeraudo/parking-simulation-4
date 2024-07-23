@@ -507,12 +507,12 @@ class EventoFinEstacionamiento {
     this.tiempoDeOcurrenciaFinEstacionamientoActual = tiempoDeOcurrenciaFinEstacionamientoActual;
     this.auto = autoQueLlega;
     this.tiempoDeOcurrencia= this.tiempoDeOcurrenciaFinEstacionamientoActual;
-    
     // Calcular el tiempo de cobro
     this.finCobro = this.tiempoDeOcurrencia + 2; // Por ejemplo, 2 unidades de tiempo después del fin de estacionamiento
   }
 
   ocurreEvento(datos) {
+
     
     // Actualizar la ocupación del lugar
     if (this.auto.tamanoActual === 'utilitario') {
@@ -526,12 +526,12 @@ class EventoFinEstacionamiento {
       this.auto.estado = 'esperando pagar';
       datos.filaCaja.push(this.auto);
     } else {
-      if (datos.cajaOcupada) {
+      if (datos.cajaOcupada==="ocupada") {
         this.auto.estado = 'esperando pagar';
         datos.filaCaja.push(this.auto);
       } else {
         this.auto.estado = 'pagando';
-        datos.cajaOcupada = true;
+        datos.cajaOcupada = "ocupada";
         datos.colaEventos.push(new EventoFinCobro(this.finCobro, this.auto));
       }
     }
