@@ -27,6 +27,7 @@ const DataTable = ({ data, variableEstadistica }) => {
                 <th>Lugares Grandes Libres</th>
                 <th>Lugares Pequeños Libres</th>
                 <th>Cantidad Autos que Pagaron</th>
+                <th>Tarifa</th>
                 <th>Total Acumulado</th>
                 <th>Autos en sistema</th>
               </tr>
@@ -65,8 +66,10 @@ const DataTable = ({ data, variableEstadistica }) => {
                   <td>{row.grandesLibres}</td>
                   <td>{row.pequeñosLibres}</td>
                   <td>{row.cantAutosPagaron}</td>
-                  <td>{row.acumuladorPlata}</td>
+                  <td>{row.tarifaAuto}</td>
+                  <td>{row.acumuladorGanancia}</td>
                   <td>{JSON.stringify(row.autos)}</td>   
+                  
                 </tr>
               ))}
             </tbody>

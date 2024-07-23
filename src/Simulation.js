@@ -127,7 +127,6 @@ class Simulation {
       rndTiempoProxFinEstacionamiento: 0,
       tiempoDeEstadiaProxFinEstacionamiento: 0,
       tiempoDeOcurrenciaFinEstacionamiento: 0,
-      nroAuto: 0,
       rndFinEstacionamientoActual: 0,
       tiempoDeEstadiaActual: 0,
       tiempoDeOcurrenciaFinEstacionamientoActual: 0,
@@ -136,6 +135,8 @@ class Simulation {
       tiempoDeOcurrenciaFinEstacionamientoActual: 0,
       autosFinEstacionamiento: [],
       rndProximoFinEstacionamiento:0,
+      acumuladorGanancia: 0,
+      tarifaAuto:0,
     };
 
     this.inicializarEventos(datos);
@@ -202,7 +203,7 @@ class Simulation {
         autos: autos,
         eventosCola: colaEventos,
         autosFinEstacionamiento: [...datos.autosFinEstacionamiento],
-        acumuladorPlata: datos.acumuladorPlata,
+        
         cantAutosIngresados: datos.cantAutosIngresados,
         cantAutosPagaron: datos.cantAutosPagaron,
         proximaLlegada: eventoProximo.proximaLlegada || null,
@@ -219,6 +220,9 @@ class Simulation {
         //tiempoDeOcurrenciaFinEstacionamientoActual: eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual,
         tiempoDeLlegada: eventoProximo.tiempoDeLlegada,
         nroFila: fila,
+        tarifaAuto:0,
+        acumuladorGanancia:datos.acumuladorGanancia,
+        
         //rndProximoFinEstacionamiento:eventoProximo.rndProximoFinEstacionamiento,
       };
 
@@ -231,10 +235,9 @@ class Simulation {
         // Evento cobro
         filaDatos.tCobro = 2; // Asumiendo que tCobro es una constante
         filaDatos.finCobro = eventoProximo.finCobro; // Obtener el tiempo de cobro
-        console.log("TIEMPO:", filaDatos.tiempoDeOcurrenciaFinEstacionamiento);
-        console.log("NRO AUTO:", filaDatos.nroAuto);
-        console.log("FIN COBRO:", filaDatos.finCobro);
+        filaDatos.tarifaAuto=eventoProximo.auto.costo;
       }
+      
       
       
 
@@ -246,7 +249,8 @@ class Simulation {
         filaDatos.proximaLlegada = eventoProximo.tiempoProximaOcurrencia;
         filaDatos.rndTamanoActual = eventoProximo.rndTamanoActual;
         filaDatos.tamanoActual = eventoProximo.tamanoActual;
-      
+        filaDatos.tarifaAuto=eventoProximo.auto.costo;
+
         // Crea EventoFinEstacionamiento
         filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
         filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadia;
@@ -277,6 +281,7 @@ class Simulation {
         filaDatos.tiempoActual=eventoProximo.tiempoDeOcurrenciaFinCobro;
         filaDatos.tCobro = 2;
         filaDatos.finCobro=eventoProximo.tiempoProximaOcurrenciaFinCobro;
+        filaDatos.tarifaAuto=eventoProximo.auto.costo;
        }
 
       console.log("hasta aca fila", filaDatos);
@@ -499,6 +504,7 @@ class EventoFinEstacionamiento {
   }
 
   ocurreEvento(datos) {
+    
     // Actualizar la ocupación del lugar
     if (this.auto.tamanoActual === 'utilitario') {
       this.auto.lugar.ocupados -= 2;
@@ -534,11 +540,15 @@ class EventoFinCobro {
     this.tiempoDeOcurrenciaFinCobro=this.tiempoDeOcurrencia;
     this.tiempoProximaOcurrenciaFinCobro = tiempoActual + 2
     this.auto = auto
+    
   }
 
   ocurreEvento(datos) {
-    datos.cantAutosPagaron += 1
-    datos.acumuladorPlata += this.auto.costo
+    
+    datos.cantAutosPagaron += 1;
+    datos.acumuladorGanancia += this.auto.costo; // Actualizar el acumulador
+    
+    //datos.acumuladorPlata += this.auto.costo
 
     let indice = datos.autosIngresados.findIndex(auto => auto.nro === this.auto.nro)
 
