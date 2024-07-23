@@ -65,9 +65,9 @@ const DataTable = ({ data, variableEstadistica }) => {
                   <td>{row.utilitariosLibres}</td>
                   <td>{row.grandesLibres}</td>
                   <td>{row.pequeñosLibres}</td>
-                  <td>{row.cantAutosPagaron}</td>
+                  <td>{row.totalAutosPagaron}</td>
                   <td>{row.tarifaAuto}</td>
-                  <td>{row.acumuladorGanancia}</td>
+                  <td>{row.totalRecaudacion}</td>
                   <td>{JSON.stringify(row.autos)}</td>   
                   
                 </tr>

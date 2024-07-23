@@ -1,43 +1,57 @@
-import React, { useState } from 'react'
-import DataTable from './components/DataTable.js'
-import SimForm from './components/SimForm.js'
-import Simulation from './Simulation'
+import React, { useState } from 'react';
+import DataTable from './components/DataTable.js';
+import SimForm from './components/SimForm.js';
+import Simulation from './Simulation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-  const [datos, setDatos] = useState([])
+  const [datos, setDatos] = useState([]);
+  const [estadisticas, setEstadisticas] = useState({
+    totalAutosPagaron: 0,
+    totalRecaudacion: 0,
+    gananciaPromedio: 0,
+  });
 
   const handleSimulation = formValues => {
-    const { cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar } = formValues
-    const sim = new Simulation()
-    sim.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular
-    sim.FILA_A_SIMULAR_DESDE = filaASimularDesde
-    sim.CANTIDAD_FILAS_A_MOSTRAR = cantidadFilasAMostrar
-    sim.comenzarEjecucion()
+    const { cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar } = formValues;
+    const sim = new Simulation();
+    sim.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular;
+    sim.FILA_A_SIMULAR_DESDE = filaASimularDesde;
+    sim.CANTIDAD_FILAS_A_MOSTRAR = cantidadFilasAMostrar;
+    sim.comenzarEjecucion();
 
-    //RESULTADOS VAR ESTADISTICAS
-    const resultados = sim.getResultados()
-    setDatos(resultados)
+    // Obtener resultados de la simulación
+    const resultados = sim.getResultados();
+    setDatos(resultados);
 
-    // Calcular var estadisticas
-    //const clientesTotales = resultados.length
-    //const clientesTristes = resultados.filter(fila => fila.evento === 'FinCoccionHorno').length
+    // Calcular estadísticas
+    const totalAutosPagaron = sim.getTotalAutosPagaron();
+    const totalRecaudacion = sim.getTotalRecaudacion();
+    const gananciaPromedio = totalAutosPagaron > 0 ? totalRecaudacion / totalAutosPagaron : 0;
 
-  }
-  // return (
-  //   <div className="App">
-  //     <h1>Simulación de Estacionamiento</h1>
-  //     <Form onSubmit={handleSimulation} />
-  //     {datos.length > 0 && <Table data={datos} porcentajeClientesTristes={porcentajeClientesTristes} />}
-  //   </div>
-  // )
+    console.log("VARIABLES ESTADISTICAS", totalAutosPagaron, totalRecaudacion);
+    setEstadisticas({
+      totalAutosPagaron,
+      totalRecaudacion,
+      gananciaPromedio,
+    });
+  };
+
   return (
     <div className="App">
       <h1>Simulación de Estacionamiento</h1>
       <SimForm onSubmit={handleSimulation} />
-      {datos.length > 0 && <DataTable data={datos}  />}
+      {datos.length > 0 && (
+        <div>
+          <h2>Resultados de la Simulación</h2>
+          <p>Total de autos que pagaron: {estadisticas.totalAutosPagaron}</p>
+          <p>Recaudación total: ${estadisticas.totalRecaudacion.toFixed(2)}</p>
+          <p>Ganancia promedio por auto: ${estadisticas.gananciaPromedio.toFixed(2)}</p>
+          <DataTable data={datos} />
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -48,6 +48,8 @@ class Simulation {
   constructor(stockInicial, cantidadFilasASimular) {
     this.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular;
     this.resultados = [];
+    this.totalAutosPagaron=0;
+    this.totalRecaudacion=0;
   }
 
   mostrarDatos(evento, datos) {
@@ -113,8 +115,6 @@ class Simulation {
       cajaOcupada: false,
       filaCaja: [],
       cantAutosIngresados: 0,
-      cantAutosPagaron: 0,
-      acumuladorPlata: 0,
       colaEventos: [],
       tiempoEntreLlegadas: 0,
       proximaLlegada: 0,
@@ -135,8 +135,9 @@ class Simulation {
       tiempoDeOcurrenciaFinEstacionamientoActual: 0,
       autosFinEstacionamiento: [],
       rndProximoFinEstacionamiento:0,
-      acumuladorGanancia: 0,
       tarifaAuto:0,
+      totalAutosPagaron:0,
+      totalRecaudacion:0,
     };
 
     this.inicializarEventos(datos);
@@ -205,7 +206,7 @@ class Simulation {
         autosFinEstacionamiento: [...datos.autosFinEstacionamiento],
         
         cantAutosIngresados: datos.cantAutosIngresados,
-        cantAutosPagaron: datos.cantAutosPagaron,
+        totalAutosPagaron: datos.totalAutosPagaron,
         proximaLlegada: eventoProximo.proximaLlegada || null,
         rndProximaLlegada: eventoProximo.rndProximaLlegada,
         ProximotiempoEntreLlegadas: eventoProximo.ProximotiempoEntreLlegadas,
@@ -221,7 +222,7 @@ class Simulation {
         tiempoDeLlegada: eventoProximo.tiempoDeLlegada,
         nroFila: fila,
         tarifaAuto:0,
-        acumuladorGanancia:datos.acumuladorGanancia,
+        totalRecaudacion:datos.totalRecaudacion,
         
         //rndProximoFinEstacionamiento:eventoProximo.rndProximoFinEstacionamiento,
       };
@@ -288,6 +289,8 @@ class Simulation {
 
       if (fila >= this.FILA_A_SIMULAR_DESDE && fila < this.FILA_A_SIMULAR_DESDE + this.CANTIDAD_FILAS_A_MOSTRAR) {
         this.resultados.push({ ...filaDatos, nroFila: fila });
+        this.totalAutosPagaron=datos.totalAutosPagaron;
+        this.totalRecaudacion=datos.totalRecaudacion;
       }
       datos.tiempoActual = eventoProximo.tiempoDeOcurrencia; // Actualiza el tiempo al tiempo de ocurrencia del evento
     }
@@ -319,6 +322,12 @@ class Simulation {
 
   getResultados() {
     return this.resultados;
+  }
+  getTotalAutosPagaron() {
+    return this.totalAutosPagaron;
+  }
+  getTotalRecaudacion() {
+    return this.totalRecaudacion;
   }
 }
 
@@ -544,11 +553,10 @@ class EventoFinCobro {
   }
 
   ocurreEvento(datos) {
-    
-    datos.cantAutosPagaron += 1;
-    datos.acumuladorGanancia += this.auto.costo; // Actualizar el acumulador
-    
-    //datos.acumuladorPlata += this.auto.costo
+    datos.cajaOcupada = false;
+    datos.totalAutosPagaron++;
+    datos.totalRecaudacion += this.auto.costo; 
+
 
     let indice = datos.autosIngresados.findIndex(auto => auto.nro === this.auto.nro)
 
