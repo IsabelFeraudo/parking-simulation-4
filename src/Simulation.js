@@ -284,34 +284,42 @@ class Simulation {
     }
   }
 
+  //EXTRAER PROXIMO EVENTO OTI
+  // extraerEventoProximo(datos) {
+  //   let eventoMasCercano = datos.colaEventos[0];
+
+  //   datos.colaEventos.forEach(evento => {
+  //     if (evento.tiempoDeOcurrencia < eventoMasCercano.tiempoDeOcurrencia) {
+  //       eventoMasCercano = evento;
+  //     }
+  //   });
+
+  //   let indice = datos.colaEventos.findIndex(
+  //     evento => evento.tiempoDeOcurrencia === eventoMasCercano.tiempoDeOcurrencia
+  //   );
+
+  //   if (indice !== -1) {
+  //     datos.colaEventos.splice(indice, 1);
+  //   }
+
+  //   return eventoMasCercano;
+  // }
+
   extraerEventoProximo(datos) {
-    let eventoMasCercano = datos.colaEventos[0];
-
-    datos.colaEventos.forEach(evento => {
-      if (evento.tiempoDeOcurrencia < eventoMasCercano.tiempoDeOcurrencia) {
-        eventoMasCercano = evento;
-      }
-    });
-
-    let indice = datos.colaEventos.findIndex(
-      evento => evento.tiempoDeOcurrencia === eventoMasCercano.tiempoDeOcurrencia
-    );
-
-    if (indice !== -1) {
-      datos.colaEventos.splice(indice, 1);
-    }
-
-    return eventoMasCercano;
+    return datos.colaEventos.shift();
   }
 
   inicializarEventos(datos) {
-    datos.colaEventos.push(new EventoInicializacion(0));
+    //datos.colaEventos.push(new EventoInicializacion(0));
+    insertarEvento(datos.colaEventos, new EventoInicializacion(0));
+    
   }
 
   getResultados() {
     return this.resultados;
   }
 }
+
 
 function tamanoActualDeAuto(random) {
   if (random < 0.6) {
@@ -340,6 +348,7 @@ constructor(tiempoActual) {
 }
 
 ocurreEvento(datos) {
+  //insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.proximaLlegada, datos.nroAuto + 1));
   insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.proximaLlegada));
 }
 }
@@ -410,7 +419,7 @@ class EventoLlegadaAuto {
         }
       }
     }
-
+    insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndProximaLlegada, this.proximotiempoEntreLlegadas, this.tiempoDeOcurrencia));
     this.auto = autoQueLlega;
     
 
@@ -433,10 +442,11 @@ class EventoLlegadaAuto {
     }
   });
 
-      datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
+      //datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
+      insertarEvento(datos.colaEventos, new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
 
-    datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeOcurrencia));
+    //datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeOcurrencia));
   
   
   }
@@ -504,7 +514,8 @@ class EventoFinEstacionamiento {
       } else {
         this.auto.estado = 'pagando';
         datos.cajaOcupada = true;
-        datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrenciaFinEstacionamientoActual, this.auto));
+        //datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrenciaFinEstacionamientoActual, this.auto));
+        insertarEvento(datos.colaEventos, new EventoFinCobro(this.tiempoDeOcurrenciaFinEstacionamientoActual, this.auto));
       }
     }
 
@@ -535,7 +546,9 @@ class EventoFinCobro {
     if (datos.filaCaja.length > 0) {
       const proximoAuto = datos.filaCaja.shift() // saca el primero de la fila
 
-      datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrencia, proximoAuto))
+      //datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrencia, proximoAuto))
+      insertarEvento(datos.colaEventos, new EventoFinCobro(this.tiempoDeOcurrencia, proximoAuto));
+
     } else {
       datos.cajaOcupada = false
     }
