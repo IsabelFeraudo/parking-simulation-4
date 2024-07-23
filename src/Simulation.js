@@ -159,7 +159,7 @@ class Simulation {
       ).length;
 
       const autos = datos.autosIngresados.map(auto => {
-        return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual };
+        return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual, costo:auto.costo };
       });
       const filaCaja = datos.filaCaja.map(auto => {
         return { nro: auto.nro };
@@ -176,7 +176,8 @@ class Simulation {
           auto: {
             nro: finEstacionamiento.auto.nro,
             estado: finEstacionamiento.auto.estado,
-            tamanoActual: finEstacionamiento.auto.tamanoActual
+            tamanoActual: finEstacionamiento.auto.tamanoActual,
+            costo:finEstacionamiento.auto.costo,
           }
         };
       });
@@ -374,8 +375,10 @@ class EventoLlegadaAuto {
   ocurreEvento(datos) {
     this.rndTamanoActual = Math.random();
     this.tamanoActual = tamanoActualDeAuto(this.rndTamanoActual);
+    this.costo = calcularCostoEstadia(this.tiempoDeEstadia,this.tamanoActual);
 
-    const autoQueLlega = new Auto(this.tamanoActual);
+
+    const autoQueLlega = new Auto(this.tamanoActual, this.costo);
 
     // Lógica de estacionamiento (sin cambios)
     if (autoQueLlega.tamanoActual === 'grande') {
@@ -427,6 +430,7 @@ class EventoLlegadaAuto {
 
       autoQueLlega.estado = 'estacionado';
       autoQueLlega.nro = datos.nroAuto;
+      autoQueLlega.costo=this.costo;
       datos.cantAutosIngresados += 1;
       datos.autosIngresados.push(autoQueLlega);
       // Agregar el auto a autosFinEstacionamiento
