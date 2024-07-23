@@ -1,37 +1,11 @@
-//SIM
-// import { CANTIDAD_DE_FILAS_A_SIMULAR, CANTIDAD_HORAS_A_SIMULAR } from './components/SimulacionFormulario'
-
-// lugaresDeEstacionamiento = [
-//    { tipo: utilitario, ocupados: 0 },
-//    { tipo: utilitario, ocupados: 0 },
-//    { tipo: peque, ocupados: 0 }
-// ]
-
-// FinDeEstadia: auto35
-// auto35 = { tamaño: peque, lugar: Lugar1{ tipo: utilitario, ocupados: 1 } }
-// auto36 = { tamaño: peque, lugar: Lugar1{ tipo: utilitario, ocupados: 2 } }
-//
-// auto35 = { tamaño: peque, lugar: { tipo: utilitario, ocupados: 0 } }
-//
-// auto35 = { tamaño: peque, lugar: null }
-
-// LlegadaVehiculo: auto36
-// auto36 = { tamaño: utilitario, lugar: { tipo: utilitario, ocupados: 0 }, }
-
-// auto35 = { tamaño: peque, lugar: null }
-
-//NOTAS:
-//NUNCA HAY UTILITARIOS PARCIALMENTE LIBRES
-//NO SE MUESTRAN LOS ACUMULADORES
-//MANTENER ID DE EVENTOS, TRAZABILIDAD
-
+// Tiempo expresado en minutos
 const CANTIDAD_DE_FILAS_A_SIMULAR = 100
 const CANTIDAD_HORAS_A_SIMULAR = 10000
 
 class Auto {
   constructor(tamano, id, estado, lugar, costo) {
     this.id = id
-    this.tamanoActual = tamano // pequeño
+    this.tamano = tamano // pequeño
     this.estado = estado // estacionado, esperando pagar, pagando
     this.lugar = lugar // { tipo: grande }
     this.costo = costo
@@ -39,39 +13,39 @@ class Auto {
 }
 
 class Lugar {
-  constructor(tamanoActual, ocupados) {
-    this.tamanoActual = tamanoActual // grande, pequeño, utilitario
+  constructor(parking_size, ocupados) {
+    this.parking_size = parking_size // grande, pequeño, utilitario
     this.ocupados = ocupados // 0, 1, 2
   }
 }
 
 class Simulation {
-  constructor(stockInicial, cantidadFilasASimular) {
+  constructor(cantidadFilasASimular) {
     this.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular;
     this.resultados = [];
   }
 
   mostrarDatos(evento, datos) {
     const utilitariosParcialmenteLibres = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 1
+      lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 1
     ).length;
     const utilitariosLibres = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 0
+      lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 0
     ).length;
     const utilitariosOcupados = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 2
+      lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 2
     ).length;
     const grandesLibres = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'grande' && lugar.ocupados === 0
+      lugar => lugar.parking_size === 'grande' && lugar.ocupados === 0
     ).length;
     const grandesOcupados = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'grande' && lugar.ocupados === 1
+      lugar => lugar.parking_size === 'grande' && lugar.ocupados === 1
     ).length;
     const pequeñosLibres = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'pequeño' && lugar.ocupados === 0
+      lugar => lugar.parking_size === 'pequeño' && lugar.ocupados === 0
     ).length;
     const pequeñosOcupados = datos.lugaresDeEstacionamiento.filter(
-      lugar => lugar.tamanoActual === 'pequeño' && lugar.ocupados === 1
+      lugar => lugar.parking_size === 'pequeño' && lugar.ocupados === 1
     ).length;
     const autos = datos.autosIngresados.map(auto => {
       return { id: auto.id, estado: auto.estado };
@@ -80,7 +54,7 @@ class Simulation {
       return { id: auto.id };
     });
     const colaEventos = datos.colaEventos.map(evento => {
-      return { nombre: evento.constructor.name, tiempo: evento.tiempoDeOcurrencia };
+      return { nombre: evento.constructor.name, tiempo: evento.tiempoDeSiguienteOcurrencia };
     });
 
     console.log(
@@ -94,10 +68,10 @@ class Simulation {
     );
 
     if (evento instanceof EventoLlegadaAuto) {
-      console.log(`rndTamanoActual
-  : ${evento.rndTamanoActual
+      console.log(`rndtamano
+  : ${evento.rndtamano
   
-      }, tamanoActual: ${evento.tamanoActual}`);
+      }, tamano: ${evento.tamano}`);
     }
   }
 
@@ -118,23 +92,19 @@ class Simulation {
       acumuladorPlata: 0,
       colaEventos: [],
       tiempoEntreLlegadas: 0,
-      proximaLlegada: 0,
       rndLlegada: 0,
       rndProximaLlegada: 0,
       ProximotiempoEntreLlegadas: 0,
       proximaLlegada: 0,
-      rndTamanoActual: 0,
-      tamanoActual: 0,
+      rndtamano: 0,
+      tamano: 0,
       rndTiempoProxFinEstacionamiento: 0,
       tiempoDeEstadiaProxFinEstacionamiento: 0,
       tiempoDeOcurrenciaFinEstacionamiento: 0,
-      idAuto: 0,
       rndFinEstacionamientoActual: 0,
       tiempoDeEstadiaActual: 0,
       tiempoDeOcurrenciaFinEstacionamientoActual: 0,
-      rndFinEstacionamientoActual: 0,
       tiempoDeLlegada: 0,
-      tiempoDeOcurrenciaFinEstacionamientoActual: 0,
       autosFinEstacionamiento: [],
       rndProximoFinEstacionamiento:0,
     };
@@ -147,26 +117,26 @@ class Simulation {
       eventoProximo.ocurreEvento(datos);
 
       const utilitariosParcialmenteLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 1
+        lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 1
       ).length;
       const utilitariosLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 0
+        lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 0
       ).length;
       const grandesLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.tamanoActual === 'grande' && lugar.ocupados === 0
+        lugar => lugar.parking_size === 'grande' && lugar.ocupados === 0
       ).length;
       const pequeñosLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.tamanoActual === 'pequeño' && lugar.ocupados === 0
+        lugar => lugar.parking_size === 'pequeño' && lugar.ocupados === 0
       ).length;
 
       const autos = datos.autosIngresados.map(auto => {
-        return { id: auto.id, estado: auto.estado, tamanoActual: auto.tamanoActual };
+        return { id: auto.id, estado: auto.estado, tamano: auto.tamano };
       });
       const filaCaja = datos.filaCaja.map(auto => {
         return { id: auto.id };
       });
       const colaEventos = datos.colaEventos.map(evento => {
-        return { nombre: evento.constructor.name, tiempo: evento.tiempoDeOcurrencia };
+        return { nombre: evento.constructor.name, tiempo: evento.tiempoDeSiguienteOcurrencia };
       });
       // Aquí es donde añadimos el mapeo de autosFinEstacionamiento
       const autosFinEstacionamiento = datos.autosFinEstacionamiento.map(finEstacionamiento => {
@@ -177,13 +147,13 @@ class Simulation {
           auto: {
             id: finEstacionamiento.auto.id,
             estado: finEstacionamiento.auto.estado,
-            tamanoActual: finEstacionamiento.auto.tamanoActual
+            tamano: finEstacionamiento.auto.tamano
           }
         };
       });
       
 
-      if (eventoProximo.tiempoDeOcurrencia > this.CANTIDAD_DE_FILAS_A_SIMULAR * 60) {
+      if (eventoProximo.tiempoDeSiguienteOcurrencia > this.CANTIDAD_DE_FILAS_A_SIMULAR * 60) {
         break;
       }
 
@@ -194,7 +164,7 @@ class Simulation {
       const filaDatos = {
         evento: eventoProximo.constructor.name,
         idAuto: eventoProximo.auto?.id || ' ', // Obtenemos idAuto si existe
-        tiempoActual: eventoProximo.tiempoActual,
+        tiempoActual: eventoProximo.tiempoDeSiguienteOcurrencia,
         estadoCajero: datos.cajaOcupada ? 'ocupada' : 'libre',
         filaCaja: [...datos.filaCaja],
         utilitariosParcialmenteLibres: utilitariosParcialmenteLibres,
@@ -211,8 +181,8 @@ class Simulation {
         rndProximaLlegada: eventoProximo.rndProximaLlegada,
         ProximotiempoEntreLlegadas: eventoProximo.ProximotiempoEntreLlegadas,
         proximaLlegada: eventoProximo.proximaLlegada,
-        rndTamanoActual: eventoProximo.rndTamanoActual,
-        tamanoActual: eventoProximo.tamanoActual,
+        rndtamano: eventoProximo.rndtamano,
+        tamano: eventoProximo.tamano,
         //rndTiempoProxFinEstacionamiento: eventoProximo.rndTiempoProxFinEstacionamiento,
         //tiempoDeEstadiaProxFinEstacionamiento: eventoProximo.tiempoDeEstadiaProxFinEstacionamiento,
         //tiempoDeOcurrenciaFinEstacionamiento: eventoProximo.tiempoDeOcurrenciaFinEstacionamiento,
@@ -246,9 +216,9 @@ class Simulation {
         filaDatos.tiempoActual = eventoProximo.tiempoActual;
         filaDatos.rndProximaLlegada = eventoProximo.rndProximaLlegada;
         filaDatos.ProximotiempoEntreLlegadas = eventoProximo.ProximotiempoEntreLlegadas;
-        filaDatos.proximaLlegada = eventoProximo.tiempoDeOcurrencia;
-        filaDatos.rndTamanoActual = eventoProximo.rndTamanoActual;
-        filaDatos.tamanoActual = eventoProximo.tamanoActual;
+        filaDatos.proximaLlegada = eventoProximo.tiempoDeSiguienteOcurrencia;
+        filaDatos.rndtamano = eventoProximo.rndtamano;
+        filaDatos.tamano = eventoProximo.tamano;
       
         // Crea EventoFinEstacionamiento
         filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
@@ -281,7 +251,7 @@ class Simulation {
       if (fila >= this.FILA_A_SIMULAR_DESDE && fila < this.FILA_A_SIMULAR_DESDE + this.CANTIDAD_FILAS_A_MOSTRAR) {
         this.resultados.push({ ...filaDatos, idFila: fila });
       }
-      datos.tiempoActual = eventoProximo.tiempoDeOcurrencia; // Actualiza el tiempo al tiempo de ocurrencia del evento
+      datos.tiempoActual = eventoProximo.tiempoDeSiguienteOcurrencia; // Actualiza el tiempo al tiempo de ocurrencia del evento
     }
   }
 
@@ -289,13 +259,13 @@ class Simulation {
     let eventoMasCercano = datos.colaEventos[0];
 
     datos.colaEventos.forEach(evento => {
-      if (evento.tiempoDeOcurrencia < eventoMasCercano.tiempoDeOcurrencia) {
+      if (evento.tiempoDeSiguienteOcurrencia < eventoMasCercano.tiempoDeSiguienteOcurrencia) {
         eventoMasCercano = evento;
       }
     });
 
     let indice = datos.colaEventos.findIndex(
-      evento => evento.tiempoDeOcurrencia === eventoMasCercano.tiempoDeOcurrencia
+      evento => evento.tiempoDeSiguienteOcurrencia === eventoMasCercano.tiempoDeSiguienteOcurrencia
     );
 
     if (indice !== -1) {
@@ -314,7 +284,7 @@ class Simulation {
   }
 }
 
-function tamanoActualDeAuto(random) {
+function tamanoDeAuto(random) {
   if (random < 0.6) {
     return 'pequeño'
   } else if (random < 0.85) {
@@ -329,12 +299,12 @@ function insertarEvento(eventosCola, nuevoEvento) {
   eventosCola.push(nuevoEvento);
   
   // Ordenar la cola de eventos por tiempo de ocurrencia
-  eventosCola.sort((a, b) => a.tiempoDeOcurrencia - b.tiempoDeOcurrencia);
+  eventosCola.sort((a, b) => a.tiempoDeSiguienteOcurrencia - b.tiempoDeSiguienteOcurrencia);
 }
 
 class EventoInicializacion {
 constructor(tiempoActual) {
-  this.tiempoDeOcurrencia = 0;
+  this.tiempoDeSiguienteOcurrencia = 0;
   this.rndLlegada = Math.random();
   this.tiempoEntreLlegadas = 12 + this.rndLlegada * (14 - 12);
   this.proximaLlegada = tiempoActual + this.tiempoEntreLlegadas;
@@ -342,7 +312,7 @@ constructor(tiempoActual) {
 }
 
 ocurreEvento(datos) {
-  insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.proximaLlegada));
+  insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.tiempoActual));
   this.tiempoActual=this.proximaLlegada;
   console.log("tiempo actual", this.tiempoActual)
 }
@@ -359,7 +329,7 @@ class EventoLlegadaAuto {
     // Evento Próxima llegada
     this.rndProximaLlegada = Math.random();
     this.ProximotiempoEntreLlegadas = 12 + this.rndProximaLlegada * (14 - 12);
-    this.tiempoDeOcurrencia = tiempoActual + this.tiempoEntreLlegadasActual;
+    this.tiempoDeSiguienteOcurrencia = tiempoActual + this.tiempoEntreLlegadasActual;
 
     // Evento FinEstacionamiento
     this.rndProximoFinEstacionamiento = Math.random();
@@ -368,35 +338,35 @@ class EventoLlegadaAuto {
   }
 
   ocurreEvento(datos) {
-    this.rndTamanoActual = Math.random();
-    this.tamanoActual = tamanoActualDeAuto(this.rndTamanoActual);
+    this.rndtamano = Math.random();
+    this.tamano = tamanoDeAuto(this.rndtamano);
 
-    const autoQueLlega = new Auto(this.tamanoActual);
+    const autoQueLlega = new Auto(this.tamano);
 
     // Lógica de estacionamiento (sin cambios)
-    if (autoQueLlega.tamanoActual === 'grande') {
+    if (autoQueLlega.tamano === 'grande') {
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
         const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-        if (lugarEstacionamiento.tamanoActual === 'grande' && lugarEstacionamiento.ocupados === 0) {
+        if (lugarEstacionamiento.parking_size === 'grande' && lugarEstacionamiento.ocupados === 0) {
           lugarEstacionamiento.ocupados += 1;
           autoQueLlega.lugar = lugarEstacionamiento;
           break;
         }
       }
-    } else if (autoQueLlega.tamanoActual === 'utilitario') {
+    } else if (autoQueLlega.tamano === 'utilitario') {
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
         const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-        if (lugarEstacionamiento.tamanoActual === 'utilitario' && lugarEstacionamiento.ocupados === 0) {
+        if (lugarEstacionamiento.parking_size === 'utilitario' && lugarEstacionamiento.ocupados === 0) {
           lugarEstacionamiento.ocupados += 2;
           autoQueLlega.lugar = lugarEstacionamiento;
           break;
         }
       }
-    } else if (autoQueLlega.tamanoActual === 'pequeño') {
+    } else if (autoQueLlega.tamano === 'pequeño') {
       let encontroLugar = false;
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
         const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-        if (lugarEstacionamiento.tamanoActual === 'pequeño' && lugarEstacionamiento.ocupados === 0) {
+        if (lugarEstacionamiento.parking_size === 'pequeño' && lugarEstacionamiento.ocupados === 0) {
           lugarEstacionamiento.ocupados += 1;
           autoQueLlega.lugar = lugarEstacionamiento;
           encontroLugar = true;
@@ -406,7 +376,7 @@ class EventoLlegadaAuto {
       if (!encontroLugar) {
         for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
           const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-          if (lugarEstacionamiento.tamanoActual === 'utilitario' && lugarEstacionamiento.ocupados < 2) {
+          if (lugarEstacionamiento.parking_size === 'utilitario' && lugarEstacionamiento.ocupados < 2) {
             lugarEstacionamiento.ocupados += 1;
             autoQueLlega.lugar = lugarEstacionamiento;
             break;
@@ -433,7 +403,7 @@ class EventoLlegadaAuto {
     auto: {
       id: this.auto.id,
       estado: this.auto.estado,
-      tamanoActual: this.auto.tamanoActual
+      tamano: this.auto.tamano
     }
   });
   console.log("TIEMPO ESTACIONAMIENTO",this.tiempoDeOcurrenciaFinEstacionamiento)
@@ -441,13 +411,11 @@ class EventoLlegadaAuto {
       datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
 
-    datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeOcurrencia));
+    datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeSiguienteOcurrencia));
   
   
   }
 }
-
-
 
 
 function calcularTiempoDeEstadia(random) {
@@ -462,10 +430,10 @@ function calcularTiempoDeEstadia(random) {
   }
 }
 
-function calcularCostoEstadia(tiempoDeEstadia, tamanoActualDeAuto) {
-  if (tamanoActualDeAuto === 'utilitario') {
+function calcularCostoEstadia(tiempoDeEstadia, tamanoDeAuto) {
+  if (tamanoDeAuto === 'utilitario') {
     return 1.5 * tiempoDeEstadia
-  } else if (tamanoActualDeAuto === 'grande') {
+  } else if (tamanoDeAuto === 'grande') {
     return 1.2 * tiempoDeEstadia
   } else {
     return 1 * tiempoDeEstadia
@@ -474,7 +442,7 @@ function calcularCostoEstadia(tiempoDeEstadia, tamanoActualDeAuto) {
 
 // evento
 // constructor ( new ... )
-// this.tiempoDeOcurrencia
+// this.tiempoDeSiguienteOcurrencia
 // ocurreEvento()
 
 class EventoFinEstacionamiento {
@@ -485,7 +453,7 @@ class EventoFinEstacionamiento {
     this.tiempoDeLlegada = tiempoDeLlegada;
     this.tiempoDeOcurrenciaFinEstacionamientoActual = tiempoDeOcurrenciaFinEstacionamientoActual;
     this.auto = autoQueLlega;
-    this.tiempoDeOcurrencia= this.tiempoDeOcurrenciaFinEstacionamientoActual;
+    this.tiempoDeSiguienteOcurrencia= this.tiempoDeOcurrenciaFinEstacionamientoActual;
     
     // Calcular el tiempo de cobro
     this.finCobro = this.tiempoDeOcurrenciaFinEstacionamientoActual + 2; // Por ejemplo, 2 unidades de tiempo después del fin de estacionamiento
@@ -493,7 +461,7 @@ class EventoFinEstacionamiento {
 
   ocurreEvento(datos) {
     // Actualizar la ocupación del lugar
-    if (this.auto.tamanoActual === 'utilitario') {
+    if (this.auto.tamano === 'utilitario') {
       this.auto.lugar.ocupados -= 2;
     } else {
       this.auto.lugar.ocupados -= 1;
@@ -523,7 +491,7 @@ class EventoFinEstacionamiento {
 
 class EventoFinCobro {
   constructor(tiempoActual, auto) {
-    this.tiempoDeOcurrencia = tiempoActual + 2
+    this.tiempoDeSiguienteOcurrencia = tiempoActual + 2
     this.auto = auto
   }
 
@@ -541,7 +509,7 @@ class EventoFinCobro {
     if (datos.filaCaja.length > 0) {
       const proximoAuto = datos.filaCaja.shift() // saca el primero de la fila
 
-      datos.colaEventos.push(new EventoFinCobro(this.tiempoDeOcurrencia, proximoAuto))
+      datos.colaEventos.push(new EventoFinCobro(this.tiempoDeSiguienteOcurrencia, proximoAuto))
     } else {
       datos.cajaOcupada = false
     }

@@ -36,7 +36,7 @@ const DataTable = ({ data, variableEstadistica }) => {
               {data.map((row, index) => (
                 <tr key={index}>
                   <td>{row.evento}</td>
-                  <td>{JSON.stringify(row.nroAuto)}</td>
+                  <td>{JSON.stringify(row.idAuto)}</td>
                   <td>{row.tiempoActual}</td>
                   <th>{row.rndTamanoActual}</th>
                   <td>{row.tamanoActual}</td>
