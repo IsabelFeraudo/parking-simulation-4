@@ -9,7 +9,7 @@ const SimForm = ({ onSubmit }) => {
     cantidadFilasASimular: 20,
     filaASimularDesde: 0,
     cantidadFilasAMostrar: 100,
-    cantidadHorasASimular:0,
+    cantidadHorasASimular: 0,
   });
 
   const handleChange = (e) => {
