@@ -1,4 +1,5 @@
 import { EventoFinCobro } from './paymentEndEvent';
+import { PARKING_SIZE, PARKING_AVAILABILITY } from './utils/constants';
 
 export class EventoFinEstacionamiento {
   constructor(rndFinEstacionamientoActual, tiempoDeEstadiaActual, tiempoDeLlegada, tiempoDeOcurrenciaFinEstacionamientoActual, autoQueLlega) {
@@ -16,7 +17,7 @@ export class EventoFinEstacionamiento {
 
   ocurreEvento(datos) {
     // Actualizar la ocupación del lugar
-    if (this.auto.tamano === 'utilitario') {
+    if (this.auto.tamano === PARKING_SIZE.UTILITARIO) {
       this.auto.lugar.ocupados -= 2;
     } else {
       this.auto.lugar.ocupados -= 1;

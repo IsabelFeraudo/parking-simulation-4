@@ -13,6 +13,5 @@ export class EventoInicializacion {
   ocurreEvento(datos) {
     insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.tiempoActual));
     this.tiempoActual = this.proximaLlegada;
-    console.log("tiempo actual", this.tiempoActual)
   }
 }

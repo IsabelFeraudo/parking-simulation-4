@@ -2,6 +2,7 @@ import { Lugar } from './lugar';
 import { EventoInicializacion } from './initEvent';
 import { EventoFinEstacionamiento } from './parkingEndEvent';
 import { EventoLlegadaAuto } from './carArriveEvent';
+import { PARKING_SIZE, PARKING_AVAILABILITY } from './utils/constants';
 
 export default class Simulation {
   constructor(cantidadFilasASimular) {
@@ -10,9 +11,9 @@ export default class Simulation {
   }
 
   comenzarEjecucion() {
-    const lugaresPequenos = Array.from({ length: 10 }, () => new Lugar('pequeño', 0));
-    const lugaresGrandes = Array.from({ length: 6 }, () => new Lugar('grande', 0));
-    const lugaresUtilitarios = Array.from({ length: 4 }, () => new Lugar('utilitario', 0));
+    const lugaresPequenos = Array.from({ length: 10 }, () => new Lugar(PARKING_SIZE.PEQUENO, PARKING_AVAILABILITY.LIBRES));
+    const lugaresGrandes = Array.from({ length: 6 }, () => new Lugar(PARKING_SIZE.GRANDE, PARKING_AVAILABILITY.LIBRES));
+    const lugaresUtilitarios = Array.from({ length: 4 }, () => new Lugar(PARKING_SIZE.UTILITARIO, PARKING_AVAILABILITY.LIBRES));
 
     const datos = {
       idAuto: 0,
@@ -51,16 +52,16 @@ export default class Simulation {
       eventoProximo.ocurreEvento(datos);
 
       const utilitariosParcialmenteLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 1
+        lugar => lugar.parking_size === PARKING_SIZE.UTILITARIO && lugar.ocupados === PARKING_AVAILABILITY.PARCIALMENTE_LIBRES
       ).length;
       const utilitariosLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.parking_size === 'utilitario' && lugar.ocupados === 0
+        lugar => lugar.parking_size === PARKING_SIZE.UTILITARIO && lugar.ocupados === PARKING_AVAILABILITY.LIBRES
       ).length;
       const grandesLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.parking_size === 'grande' && lugar.ocupados === 0
+        lugar => lugar.parking_size === PARKING_SIZE.GRANDE && lugar.ocupados === PARKING_AVAILABILITY.LIBRES
       ).length;
       const pequeñosLibres = datos.lugaresDeEstacionamiento.filter(
-        lugar => lugar.parking_size === 'pequeño' && lugar.ocupados === 0
+        lugar => lugar.parking_size === PARKING_SIZE.PEQUENO && lugar.ocupados === PARKING_AVAILABILITY.LIBRES
       ).length;
 
       const autos = datos.autosIngresados.map(auto => {

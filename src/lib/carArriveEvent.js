@@ -1,6 +1,7 @@
 import { Auto } from './auto';
 import { EventoFinEstacionamiento } from './parkingEndEvent';
 import { calcularTiempoDeEstadia, tamanoDeAuto } from './utils';
+import { PARKING_SIZE, PARKING_AVAILABILITY } from './utils/constants';
 
 export class EventoLlegadaAuto {
   constructor(rndLlegada, tiempoEntreLlegadas, tiempoActual) {
@@ -26,29 +27,29 @@ export class EventoLlegadaAuto {
 
     const autoQueLlega = new Auto(this.tamano);
     // Lógica de estacionamiento (sin cambios)
-    if (autoQueLlega.tamano === 'grande') {
+    if (autoQueLlega.tamano === PARKING_SIZE.GRANDE) {
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
         const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-        if (lugarEstacionamiento.parking_size === 'grande' && lugarEstacionamiento.ocupados === 0) {
+        if (lugarEstacionamiento.parking_size === PARKING_SIZE.GRANDE && lugarEstacionamiento.ocupados === PARKING_AVAILABILITY.LIBRES) {
           lugarEstacionamiento.ocupados += 1;
           autoQueLlega.lugar = lugarEstacionamiento;
           break;
         }
       }
-    } else if (autoQueLlega.tamano === 'utilitario') {
+    } else if (autoQueLlega.tamano === PARKING_SIZE.UTILITARIO) {
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
         const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-        if (lugarEstacionamiento.parking_size === 'utilitario' && lugarEstacionamiento.ocupados === 0) {
+        if (lugarEstacionamiento.parking_size === PARKING_SIZE.UTILITARIO && lugarEstacionamiento.ocupados === PARKING_AVAILABILITY.LIBRES) {
           lugarEstacionamiento.ocupados += 2;
           autoQueLlega.lugar = lugarEstacionamiento;
           break;
         }
       }
-    } else if (autoQueLlega.tamano === 'pequeño') {
+    } else if (autoQueLlega.tamano === PARKING_SIZE.PEQUENO) {
       let encontroLugar = false;
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
         const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-        if (lugarEstacionamiento.parking_size === 'pequeño' && lugarEstacionamiento.ocupados === 0) {
+        if (lugarEstacionamiento.parking_size === PARKING_SIZE.PEQUENO && lugarEstacionamiento.ocupados === PARKING_AVAILABILITY.LIBRES) {
           lugarEstacionamiento.ocupados += 1;
           autoQueLlega.lugar = lugarEstacionamiento;
           encontroLugar = true;
@@ -58,7 +59,7 @@ export class EventoLlegadaAuto {
       if (!encontroLugar) {
         for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
           const lugarEstacionamiento = datos.lugaresDeEstacionamiento[i];
-          if (lugarEstacionamiento.parking_size === 'utilitario' && lugarEstacionamiento.ocupados < 2) {
+          if (lugarEstacionamiento.parking_size === PARKING_SIZE.UTILITARIO && lugarEstacionamiento.ocupados < 2) {
             lugarEstacionamiento.ocupados += 1;
             autoQueLlega.lugar = lugarEstacionamiento;
             break;
@@ -86,7 +87,6 @@ export class EventoLlegadaAuto {
           tamano: this.auto.tamano
         }
       });
-      console.log("TIEMPO ESTACIONAMIENTO", this.tiempoDeOcurrenciaFinEstacionamiento)
       datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
     datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeSiguienteOcurrencia));
