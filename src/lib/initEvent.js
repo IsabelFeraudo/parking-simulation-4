@@ -1,5 +1,4 @@
 import { EventoLlegadaAuto } from './carArriveEvent';
-import { insertarEvento } from './utils';
 
 export class EventoInicializacion {
   constructor(tiempoActual) {
@@ -11,7 +10,14 @@ export class EventoInicializacion {
   }
 
   ocurreEvento(datos) {
-    insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.tiempoActual));
+    this._insertarEvento(datos.colaEventos, new EventoLlegadaAuto(this.rndLlegada, this.tiempoEntreLlegadas, this.tiempoActual));
     this.tiempoActual = this.proximaLlegada;
+  }
+
+  _insertarEvento(eventosCola, nuevoEvento) {
+    // Insertar el nuevo evento en la cola
+    eventosCola.push(nuevoEvento);
+    // Ordenar la cola de eventos por tiempo de ocurrencia
+    eventosCola.sort((a, b) => a.tiempoDeSiguienteOcurrencia - b.tiempoDeSiguienteOcurrencia);
   }
 }

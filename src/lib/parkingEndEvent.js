@@ -1,5 +1,5 @@
 import { EventoFinCobro } from './paymentEndEvent';
-import { PARKING_SIZE, PARKING_AVAILABILITY } from './utils/constants';
+import { PARKING_SIZE } from './utils/constants';
 
 export class EventoFinEstacionamiento {
   constructor(rndFinEstacionamientoActual, tiempoDeEstadiaActual, tiempoDeLlegada, tiempoDeOcurrenciaFinEstacionamientoActual, autoQueLlega) {

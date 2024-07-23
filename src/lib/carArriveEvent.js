@@ -1,6 +1,5 @@
 import { Auto } from './auto';
 import { EventoFinEstacionamiento } from './parkingEndEvent';
-import { calcularTiempoDeEstadia, tamanoDeAuto } from './utils';
 import { PARKING_SIZE, PARKING_AVAILABILITY } from './utils/constants';
 
 export class EventoLlegadaAuto {
@@ -17,13 +16,13 @@ export class EventoLlegadaAuto {
 
     // Evento FinEstacionamiento
     this.rndProximoFinEstacionamiento = Math.random();
-    this.tiempoDeEstadia = calcularTiempoDeEstadia(this.rndProximoFinEstacionamiento);
+    this.tiempoDeEstadia = this._calcularTiempoDeEstadia(this.rndProximoFinEstacionamiento);
     this.tiempoDeOcurrenciaFinEstacionamiento = tiempoActual + this.tiempoDeEstadia;
   }
 
   ocurreEvento(datos) {
     this.rndtamano = Math.random();
-    this.tamano = tamanoDeAuto(this.rndtamano);
+    this.tamano = this._tamanoDeAuto(this.rndtamano);
 
     const autoQueLlega = new Auto(this.tamano);
     // Lógica de estacionamiento (sin cambios)
@@ -90,5 +89,27 @@ export class EventoLlegadaAuto {
       datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoActual, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
     datos.colaEventos.push(new EventoLlegadaAuto(this.rndProximaLlegada, this.ProximotiempoEntreLlegadas, this.tiempoDeSiguienteOcurrencia));
+  }
+
+  _tamanoDeAuto(random) {
+    if (random < 0.6) {
+      return PARKING_SIZE.PEQUENO
+    } else if (random < 0.85) {
+      return PARKING_SIZE.GRANDE
+    } else {
+      return PARKING_SIZE.UTILITARIO
+    }
+  }
+
+  _calcularTiempoDeEstadia(random) {
+    if (random < 0.5) {
+      return 60
+    } else if (random < 0.8) {
+      return 120
+    } else if (random < 0.95) {
+      return 180
+    } else {
+      return 240
+    }
   }
 }

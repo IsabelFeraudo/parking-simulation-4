@@ -170,7 +170,8 @@ export default class Simulation {
   }
 
   inicializarEventos(datos) {
-    datos.colaEventos.push(new EventoInicializacion(0));
+    const tiempoInicial = 0;
+    datos.colaEventos.push(new EventoInicializacion(tiempoInicial));
   }
 
   extraerEventoProximo(datos) {
