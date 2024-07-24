@@ -38,7 +38,7 @@ const SimForm = ({ onSubmit }) => {
       return;
     }
     if (formValues.modoSimulacion === 'filas' && formValues.cantidadFilasAMostrar > (formValues.cantidadFilasASimular - formValues.filaASimularDesde)) {
-      alert("Cantidad de Filas a Mostrar no puede ser mayor que (Cantidad de Filas a Simular - Fila a Simular Desde).");
+      alert("Cantidad de Filas a Mostrar no puede ser mayor que (Cantidad de Filas a Simular - Fila a Mostrar Desde).");
       return;
     }
     onSubmit(formValues);
