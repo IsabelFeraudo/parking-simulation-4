@@ -1,24 +1,3 @@
-// import { CANTIDAD_DE_FILAS_A_SIMULAR, CANTIDAD_HORAS_A_SIMULAR } from './components/SimulacionFormulario'
-
-// lugaresDeEstacionamiento = [
-//    { tipo: utilitario, ocupados: 0 },
-//    { tipo: utilitario, ocupados: 0 },
-//    { tipo: peque, ocupados: 0 }
-// ]
-
-// FinDeEstadia: auto35
-// auto35 = { tamaño: peque, lugar: Lugar1{ tipo: utilitario, ocupados: 1 } }
-// auto36 = { tamaño: peque, lugar: Lugar1{ tipo: utilitario, ocupados: 2 } }
-//
-// auto35 = { tamaño: peque, lugar: { tipo: utilitario, ocupados: 0 } }
-//
-// auto35 = { tamaño: peque, lugar: null }
-
-// LlegadaVehiculo: auto36
-// auto36 = { tamaño: utilitario, lugar: { tipo: utilitario, ocupados: 0 }, }
-
-// auto35 = { tamaño: peque, lugar: null }
-
 //NOTAS:
 //NUNCA HAY UTILITARIOS PARCIALMENTE LIBRES
 //NO SE MUESTRAN LOS ACUMULADORES
@@ -26,6 +5,16 @@
 
 const CANTIDAD_DE_FILAS_A_SIMULAR = 100
 const CANTIDAD_HORAS_A_SIMULAR = 10000
+
+const valoresUsuario = {
+  cantidadFilasASimular: 20,
+  filaASimularDesde: 0,
+  cantidadFilasAMostrar: 100,
+  cantidadHorasASimular: 0,
+  mostrarDesdeHora: 0,
+  mostrarHastaHora: 100,
+  modoSimulacion: 'filas' // Puede ser 'horas'
+};
 
 class Auto {
   constructor(tamanoActual, nro, estado, lugar, costo) {
@@ -146,6 +135,7 @@ class Simulation {
     };
 
     this.inicializarEventos(datos);
+    console.log("DATOS;",this.CANTIDAD_DE_HORAS_A_SIMULAR,this.MOSTRAR_DESDE_HORA,this.MOSTRAR_HASTA_HORA)
 
     for (let fila = 0; fila < this.CANTIDAD_DE_FILAS_A_SIMULAR; fila++) {
       const eventoProximo = this.extraerEventoProximo(datos);
