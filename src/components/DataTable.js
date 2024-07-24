@@ -37,15 +37,15 @@ const DataTable = ({ data, variableEstadistica }) => {
                 <tr key={index}>
                   <td>{row.evento}</td>
                   <td>{JSON.stringify(row.nroAuto)}</td>
-                  <td>{row.tiempoActual}</td>
-                  <th>{row.rndTamanoActual}</th>
+                  <th>{row.tiempoActual}</th>
+                  <td>{row.rndTamanoActual}</td>
                   <td>{row.tamanoActual}</td>
-                  <th>{row.rndProximaLlegada}</th>
+                  <td>{row.rndProximaLlegada}</td>
                   <td>{row.ProximotiempoEntreLlegadas}</td>
-                  <td>{JSON.stringify(row.proximaLlegada)}</td>
-                  <th>{row.rndProximoFinEstacionamiento}</th>
+                  <th>{JSON.stringify(row.proximaLlegada)}</th>
+                  <td>{row.rndProximoFinEstacionamiento}</td>
                   <td>{row.tiempoDeEstadiaProxFinEstacionamiento}</td>
-                  <td>
+                  <th>
                     {row.autosFinEstacionamiento.map((finEstacionamiento, idx) => (
                       <div key={idx}>
                         <p>
@@ -56,9 +56,9 @@ const DataTable = ({ data, variableEstadistica }) => {
                         </p>
                       </div>
                     ))}
-                  </td>
-                  <th>{row.tCobro}</th>
-                  <td>{row.finCobro}</td>
+                  </th>
+                  <td>{row.tCobro}</td>
+                  <th>{row.finCobro}</th>
                   <td>{JSON.stringify(row.estadoCajero)}</td>
                   <td>{JSON.stringify(row.filaCaja)}</td>   
                   <td>{row.cantAutosIngresados}</td>    
