@@ -338,6 +338,7 @@ class Simulation {
           nroFila: fila,
           tarifaAuto:0,
           totalRecaudacion:datos.totalRecaudacion,
+          tiempoProximaOcurrenciaFinCobro:eventoProximo.tiempoProximaOcurrenciaFinCobro,
 
         };
   
@@ -678,12 +679,13 @@ class EventoFinCobro {
   constructor(tiempoActual, auto) {
     this.tiempoDeOcurrencia = tiempoActual;
     this.tiempoDeOcurrenciaFinCobro = this.tiempoDeOcurrencia;
+    this.tiempoProximaOcurrenciaFinCobro=tiempoActual;
     
     this.auto = auto;
   }
 
   ocurreEvento(datos) {
-
+    datos.finCobro=this.tiempoDeOcurrencia;
     datos.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
     this.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
     // 1. Eliminar el auto que está en estado "pagando" del arreglo autos
@@ -713,20 +715,22 @@ class EventoFinCobro {
       // Actualizar el estado del sistema
       datos.totalAutosPagaron++;
       datos.totalRecaudacion += autoPrioritario.costo;
-
+      this.tiempoProximaOcurrenciaFinCobro=this.tiempoDeOcurrencia;
       // Crear un nuevo evento si hay más autos en la cola de la caja
       if (datos.filaCaja.length > 0) {
         // Verificar si ya existe un evento fin de cobro en la cola de eventos
         
         const existeEventoFinCobro = datos.colaEventos.some(evento => evento instanceof EventoFinCobro);
-
+        
         if (!existeEventoFinCobro) {
           // Solo se crea un nuevo EventoFinCobro si no hay uno ya en la cola de eventos
           this.tiempoProximaOcurrenciaFinCobro = this.tiempoDeOcurrencia + 2;
+          datos.finCobro=this.tiempoProximaOcurrenciaFinCobro;
           const proximoAuto = datos.filaCaja[0]; // Obtener el primer auto de la fila sin removerlo
-          datos.colaEventos.push(new EventoFinCobro(this.tiempoProximaOcurrenciaFinCobro, proximoAuto));
+         // datos.colaEventos.push(new EventoFinCobro(this.tiempoProximaOcurrenciaFinCobro, proximoAuto));
         }
       } else {
+        
         datos.cajaOcupada = false; // Si no hay más autos en la cola, la caja pasa a estar libre
       }
     } else {
