@@ -1,3 +1,4 @@
+
 const valoresUsuario = {
   cantidadFilasASimular: 0,
   filaASimularDesde: 0,
@@ -125,6 +126,7 @@ class Simulation {
       tarifaAuto:0,
       totalAutosPagaron:0,
       totalRecaudacion:0,
+      proximoFinCobro:0,
     };
 
     this.inicializarEventos(datos);
@@ -209,6 +211,7 @@ class Simulation {
         tiempoDeLlegada: eventoProximo.tiempoDeLlegada,
         tarifaAuto: 0,
         totalRecaudacion: datos.totalRecaudacion,
+        proximoFinCobro:eventoProximo.proximoFinCobro,
       };
 
       if (eventoProximo instanceof EventoFinEstacionamiento) {
@@ -218,6 +221,8 @@ class Simulation {
         filaDatos.tCobro = 2;
         filaDatos.finCobro = eventoProximo.finCobro;
         filaDatos.tarifaAuto = eventoProximo.auto.costo;
+        filaDatos.proximaLlegada=eventoProximo.proximaLlegada;
+        
       }
 
       if (eventoProximo instanceof EventoLlegadaAuto) {
@@ -233,6 +238,7 @@ class Simulation {
         filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadia;
         filaDatos.tiempoDeLlegada = eventoProximo.tiempoActual;
         filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
+        filaDatos.finCobro = eventoProximo.finCobro;
       }
 
       if (eventoProximo instanceof EventoInicializacion) {
@@ -247,6 +253,7 @@ class Simulation {
         filaDatos.tCobro = 2;
         filaDatos.finCobro = eventoProximo.tiempoProximaOcurrenciaFinCobro;
         filaDatos.tarifaAuto = eventoProximo.auto.costo;
+        filaDatos.proximaLlegada=datos.proximaLlegada;
       }
 
       if (datos.tiempoActual >= this.MOSTRAR_DESDE_HORA * 60 && datos.tiempoActual < this.MOSTRAR_HASTA_HORA * 60 && eventoProximo.tiempoDeOcurrencia < this.MOSTRAR_HASTA_HORA * 60) {
@@ -344,6 +351,8 @@ class Simulation {
           filaDatos.tCobro = 2; // Asumiendo que tCobro es una constante
           filaDatos.finCobro = eventoProximo.finCobro; // Obtener el tiempo de cobro
           filaDatos.tarifaAuto=eventoProximo.auto.costo;
+
+          filaDatos.proximaLlegada=eventoProximo.proximaLlegada;
         }
         
         
@@ -358,12 +367,16 @@ class Simulation {
           filaDatos.rndTamanoActual = eventoProximo.rndTamanoActual;
           filaDatos.tamanoActual = eventoProximo.tamanoActual;
           filaDatos.tarifaAuto=eventoProximo.auto.costo;
+          filaDatos.finCobro = eventoProximo.finCobro;
   
           // Crea EventoFinEstacionamiento
           filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
           filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadia;
           filaDatos.tiempoDeLlegada = eventoProximo.tiempoActual; // Ajuste necesario
           filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
+       
+          filaDatos.proximaLlegada = datos.proximaLlegada;
+
         }
         
       
@@ -371,9 +384,7 @@ class Simulation {
           filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
           filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
           filaDatos.nroAuto = eventoProximo.auto.nro; // Obtener el número de auto
-        
-          console.log("TIEMPO:", filaDatos.tiempoDeOcurrenciaFinEstacionamiento);
-          console.log("NRO AUTO:", filaDatos.nroAuto);
+          filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
         }
         
   
@@ -390,6 +401,7 @@ class Simulation {
           filaDatos.tCobro = 2;
           filaDatos.finCobro=eventoProximo.tiempoProximaOcurrenciaFinCobro;
           filaDatos.tarifaAuto=eventoProximo.auto.costo;
+          filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
          }
   
         console.log("hasta aca fila", filaDatos);
@@ -498,6 +510,9 @@ class EventoLlegadaAuto {
   }
 
   ocurreEvento(datos) {
+    this.finCobro= obtenerTiempoDeOcurrenciaFinCobro(datos);
+    datos.proximoFinCobro=obtenerTiempoDeOcurrenciaFinCobro(datos);
+    datos.proximaLlegada=this.tiempoProximaOcurrencia;
     this.rndTamanoActual = Math.random();
     this.tamanoActual = tamanoActualDeAuto(this.rndTamanoActual);
     this.costo = calcularCostoEstadia(this.tiempoDeEstadia,this.tamanoActual);
@@ -615,6 +630,10 @@ class EventoFinEstacionamiento {
   }
 
   ocurreEvento(datos) {
+
+    datos.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
+    this.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
+    this.finCobro=obtenerTiempoDeOcurrenciaFinCobro(datos);
     // Actualizar la ocupación del lugar
     if (this.auto.tamanoActual === 'utilitario') {
       this.auto.lugar.ocupados -= 2;
@@ -641,7 +660,7 @@ class EventoFinEstacionamiento {
         const existeEventoFinCobro = datos.colaEventos.some(evento => evento instanceof EventoFinCobro);
 
         if (!existeEventoFinCobro) {
-          this.finCobro = this.tiempoDeOcurrencia + 100; // Por ejemplo, 100 unidades de tiempo después del fin de estacionamiento
+          this.finCobro = this.tiempoDeOcurrencia + 2; // Por ejemplo, 100 unidades de tiempo después del fin de estacionamiento
 
           datos.colaEventos.push(new EventoFinCobro(this.finCobro, this.auto));
         }
@@ -659,11 +678,14 @@ class EventoFinCobro {
   constructor(tiempoActual, auto) {
     this.tiempoDeOcurrencia = tiempoActual;
     this.tiempoDeOcurrenciaFinCobro = this.tiempoDeOcurrencia;
-    this.tiempoProximaOcurrenciaFinCobro = tiempoActual + 100;
+    
     this.auto = auto;
   }
 
   ocurreEvento(datos) {
+
+    datos.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
+    this.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
     // 1. Eliminar el auto que está en estado "pagando" del arreglo autos
     let indicePagando = datos.autosIngresados.findIndex(auto => auto.estado === "pagando");
     if (indicePagando !== -1) {
@@ -695,10 +717,12 @@ class EventoFinCobro {
       // Crear un nuevo evento si hay más autos en la cola de la caja
       if (datos.filaCaja.length > 0) {
         // Verificar si ya existe un evento fin de cobro en la cola de eventos
+        
         const existeEventoFinCobro = datos.colaEventos.some(evento => evento instanceof EventoFinCobro);
 
         if (!existeEventoFinCobro) {
           // Solo se crea un nuevo EventoFinCobro si no hay uno ya en la cola de eventos
+          this.tiempoProximaOcurrenciaFinCobro = this.tiempoDeOcurrencia + 2;
           const proximoAuto = datos.filaCaja[0]; // Obtener el primer auto de la fila sin removerlo
           datos.colaEventos.push(new EventoFinCobro(this.tiempoProximaOcurrenciaFinCobro, proximoAuto));
         }
@@ -711,5 +735,40 @@ class EventoFinCobro {
   }
 }
 
+function obtenerMayorTiempoDeOcurrencia(datos) {
+  // Filtrar los eventos para obtener solo los EventoLlegadaAuto
+  const eventosLlegada = datos.colaEventos.filter(evento => evento instanceof EventoLlegadaAuto);
+
+  // Si no hay eventos de llegada, retornar undefined o un valor apropiado
+  if (eventosLlegada.length === 0) {
+    return undefined; // O cualquier valor que consideres apropiado
+  }
+
+  // Encontrar el EventoLlegadaAuto con el mayor tiempoDeOcurrencia
+  const eventoMaximo = eventosLlegada.reduce((max, evento) => {
+    return evento.tiempoDeOcurrencia > max.tiempoDeOcurrencia ? evento : max;
+  });
+
+  // Retornar el tiempoDeOcurrencia del evento con el mayor valor
+  console.log("tiempo ocurrencia",eventoMaximo.tiempoDeOcurrencia)
+  return eventoMaximo.tiempoDeOcurrencia;
+ 
+}
+
+// Función para obtener el tiempo de ocurrencia del primer evento FinCobro en el arreglo
+function obtenerTiempoDeOcurrenciaFinCobro(datos) {
+  // Filtrar eventos FinCobro
+  const eventosFinCobro = datos.colaEventos.filter(evento => evento instanceof EventoFinCobro);
+
+  // Si hay eventos FinCobro, obtener el tiempo de ocurrencia del primero
+  if (eventosFinCobro.length > 0) {
+    // Puedes elegir el primer evento o el que tenga el mayor tiempo de ocurrencia
+    const primerEvento = eventosFinCobro[0];
+    return primerEvento.tiempoDeOcurrencia;
+  }
+
+  // Retornar un valor predeterminado si no se encuentran eventos FinCobro
+  return undefined; // O puedes retornar un valor predeterminado según tu lógica
+}
 
 export default Simulation
