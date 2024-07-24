@@ -1,10 +1,10 @@
 const valoresUsuario = {
-  cantidadFilasASimular: 20,
+  cantidadFilasASimular: 0,
   filaASimularDesde: 0,
-  cantidadFilasAMostrar: 100,
+  cantidadFilasAMostrar: 0,
   cantidadHorasASimular: 0,
   mostrarDesdeHora: 0,
-  mostrarHastaHora: 100,
+  mostrarHastaHora: 0,
   modoSimulacion: 'filas' // Puede ser 'horas'
 };
 

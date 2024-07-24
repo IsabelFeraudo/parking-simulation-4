@@ -4,13 +4,13 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 const SimForm = ({ onSubmit }) => {
   const [formValues, setFormValues] = useState({
     //filas
-    cantidadFilasASimular: 20,
+    cantidadFilasASimular: 10,
     filaASimularDesde: 0,
-    cantidadFilasAMostrar: 100,
+    cantidadFilasAMostrar: 10,
     //horas
-    cantidadHorasASimular: 0,
+    cantidadHorasASimular: 5,
     mostrarDesdeHora: 0,
-    mostrarHastaHora: 100,
+    mostrarHastaHora: 5,
     //modo simulacion
     modoSimulacion: 'filas' // Puede ser 'filas' o 'horas'
   });
@@ -35,6 +35,10 @@ const SimForm = ({ onSubmit }) => {
     e.preventDefault();
     if (formValues.modoSimulacion === 'horas' && (formValues.cantidadHorasASimular <= 0 || formValues.mostrarDesdeHora < 0 || formValues.mostrarHastaHora > 24 || formValues.mostrarDesdeHora >= formValues.mostrarHastaHora)) {
       alert("Por favor, ingrese valores válidos para la simulación por horas.");
+      return;
+    }
+    if (formValues.modoSimulacion === 'filas' && formValues.cantidadFilasAMostrar > (formValues.cantidadFilasASimular - formValues.filaASimularDesde)) {
+      alert("Cantidad de Filas a Mostrar no puede ser mayor que (Cantidad de Filas a Simular - Fila a Simular Desde).");
       return;
     }
     onSubmit(formValues);
