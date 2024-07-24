@@ -13,8 +13,9 @@ function App() {
   });
 
   const handleSimulation = formValues => {
-    const { cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar,cantidadHorasASimular, mostrarDesdeHora,mostrarHastaHora } = formValues;
+    const { modoSimulacion,cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar,cantidadHorasASimular, mostrarDesdeHora,mostrarHastaHora } = formValues;
     const sim = new Simulation();
+    sim.MODO_SIMULACION= modoSimulacion;
     sim.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular;
     sim.FILA_A_SIMULAR_DESDE = filaASimularDesde;
     sim.CANTIDAD_FILAS_A_MOSTRAR = cantidadFilasAMostrar;

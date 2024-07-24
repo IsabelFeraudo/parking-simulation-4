@@ -1,11 +1,3 @@
-//NOTAS:
-//NUNCA HAY UTILITARIOS PARCIALMENTE LIBRES
-//NO SE MUESTRAN LOS ACUMULADORES
-//MANTENER ID DE EVENTOS, TRAZABILIDAD
-
-const CANTIDAD_DE_FILAS_A_SIMULAR = 100
-const CANTIDAD_HORAS_A_SIMULAR = 10000
-
 const valoresUsuario = {
   cantidadFilasASimular: 20,
   filaASimularDesde: 0,
@@ -34,7 +26,8 @@ class Lugar {
 }
 
 class Simulation {
-  constructor(cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar,cantidadHorasASimular, mostrarDesdeHora,mostrarHastaHora ) {
+  constructor(modoSimulacion,cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar,cantidadHorasASimular, mostrarDesdeHora,mostrarHastaHora ) {
+    this.MODO_SIMULACION= modoSimulacion;
     this.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular;
     this.FILA_A_SIMULAR_DESDE = filaASimularDesde;
     this.CANTIDAD_FILAS_A_MOSTRAR = cantidadFilasAMostrar;
@@ -137,7 +130,17 @@ class Simulation {
     this.inicializarEventos(datos);
     console.log("DATOS;",this.CANTIDAD_DE_HORAS_A_SIMULAR,this.MOSTRAR_DESDE_HORA,this.MOSTRAR_HASTA_HORA)
 
-    for (let fila = 0; fila < this.CANTIDAD_DE_FILAS_A_SIMULAR; fila++) {
+
+    //SIMULACION POR HORAS
+    if (this.MODO_SIMULACION === 'horas') {
+      console.log("MODO SIM:", this.MODO_SIMULACION)
+    const tiempoSimulacionMax = this.CANTIDAD_DE_HORAS_A_SIMULAR * 60; // Convertir horas a minutos
+
+    // Inicializar el tiempo actual al inicio de la simulación
+    datos.tiempoActual = 0;
+    console.log("tiempoSimulacionMax", tiempoSimulacionMax)
+    while (datos.tiempoActual < tiempoSimulacionMax) {
+     
       const eventoProximo = this.extraerEventoProximo(datos);
 
       eventoProximo.ocurreEvento(datos);
@@ -164,7 +167,6 @@ class Simulation {
       const colaEventos = datos.colaEventos.map(evento => {
         return { nombre: evento.constructor.name, tiempo: evento.tiempoDeOcurrencia };
       });
-      // Aquí es donde añadimos el mapeo de autosFinEstacionamiento
       const autosFinEstacionamiento = datos.autosFinEstacionamiento.map(finEstacionamiento => {
         return {
           tiempoDeEstadiaActual: finEstacionamiento.tiempoDeEstadiaActual,
@@ -178,17 +180,14 @@ class Simulation {
           }
         };
       });
-      
 
-      if (eventoProximo.tiempoDeOcurrencia > this.CANTIDAD_DE_FILAS_A_SIMULAR * 60) {
+      if (eventoProximo.tiempoDeOcurrencia > tiempoSimulacionMax) {
         break;
       }
 
-      // this.mostrarDatos(eventoProximo, datos);
-
       const filaDatos = {
         evento: eventoProximo.constructor.name,
-        nroAuto: eventoProximo.auto?.nro || ' ', // Obtenemos nroAuto si existe
+        nroAuto: eventoProximo.auto?.nro || ' ',
         tiempoActual: eventoProximo.tiempoActual,
         estadoCajero: datos.cajaOcupada ? 'ocupada' : 'libre',
         filaCaja: [...datos.filaCaja],
@@ -199,7 +198,6 @@ class Simulation {
         autos: autos,
         eventosCola: colaEventos,
         autosFinEstacionamiento: [...datos.autosFinEstacionamiento],
-        
         cantAutosIngresados: datos.cantAutosIngresados,
         totalAutosPagaron: datos.totalAutosPagaron,
         proximaLlegada: eventoProximo.proximaLlegada || null,
@@ -208,88 +206,217 @@ class Simulation {
         proximaLlegada: eventoProximo.proximaLlegada,
         rndTamanoActual: eventoProximo.rndTamanoActual,
         tamanoActual: eventoProximo.tamanoActual,
-        //rndTiempoProxFinEstacionamiento: eventoProximo.rndTiempoProxFinEstacionamiento,
-        //tiempoDeEstadiaProxFinEstacionamiento: eventoProximo.tiempoDeEstadiaProxFinEstacionamiento,
-        //tiempoDeOcurrenciaFinEstacionamiento: eventoProximo.tiempoDeOcurrenciaFinEstacionamiento,
-        //rndFinEstacionamientoActual: eventoProximo.rndFinEstacionamientoActual,
-        //tiempoDeEstadiaActual: eventoProximo.tiempoDeEstadiaActual,
-        //tiempoDeOcurrenciaFinEstacionamientoActual: eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual,
         tiempoDeLlegada: eventoProximo.tiempoDeLlegada,
-        nroFila: fila,
-        tarifaAuto:0,
-        totalRecaudacion:datos.totalRecaudacion,
-        
-        //rndProximoFinEstacionamiento:eventoProximo.rndProximoFinEstacionamiento,
+        tarifaAuto: 0,
+        totalRecaudacion: datos.totalRecaudacion,
       };
-
 
       if (eventoProximo instanceof EventoFinEstacionamiento) {
         filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
         filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
-        filaDatos.nroAuto = eventoProximo.auto.nro; // Obtener el número de auto
-      
-        // Evento cobro
-        filaDatos.tCobro = 2; // Asumiendo que tCobro es una constante
-        filaDatos.finCobro = eventoProximo.finCobro; // Obtener el tiempo de cobro
-        filaDatos.tarifaAuto=eventoProximo.auto.costo;
+        filaDatos.nroAuto = eventoProximo.auto.nro;
+        filaDatos.tCobro = 2;
+        filaDatos.finCobro = eventoProximo.finCobro;
+        filaDatos.tarifaAuto = eventoProximo.auto.costo;
       }
-      
-      
-      
 
       if (eventoProximo instanceof EventoLlegadaAuto) {
-        filaDatos.nroAuto = eventoProximo.auto.nro; // Accede al número de auto correctamente
+        filaDatos.nroAuto = eventoProximo.auto.nro;
         filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaLlegadaActual;
         filaDatos.rndProximaLlegada = eventoProximo.rndProximaLlegada;
         filaDatos.ProximotiempoEntreLlegadas = eventoProximo.ProximotiempoEntreLlegadas;
         filaDatos.proximaLlegada = eventoProximo.tiempoProximaOcurrencia;
         filaDatos.rndTamanoActual = eventoProximo.rndTamanoActual;
         filaDatos.tamanoActual = eventoProximo.tamanoActual;
-        filaDatos.tarifaAuto=eventoProximo.auto.costo;
+        filaDatos.tarifaAuto = eventoProximo.auto.costo;
 
-        // Crea EventoFinEstacionamiento
         filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
         filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadia;
-        filaDatos.tiempoDeLlegada = eventoProximo.tiempoActual; // Ajuste necesario
+        filaDatos.tiempoDeLlegada = eventoProximo.tiempoActual;
         filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
       }
-      
-    
-      if (eventoProximo instanceof EventoFinEstacionamiento) {
-        filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
-        filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
-        filaDatos.nroAuto = eventoProximo.auto.nro; // Obtener el número de auto
-      
-        console.log("TIEMPO:", filaDatos.tiempoDeOcurrenciaFinEstacionamiento);
-        console.log("NRO AUTO:", filaDatos.nroAuto);
+
+      if (eventoProximo instanceof EventoInicializacion) {
+        filaDatos.tiempoActual = datos.tiempoActual;
+        filaDatos.ProximotiempoEntreLlegadas = eventoProximo.tiempoEntreLlegadas;
+        filaDatos.rndProximaLlegada = eventoProximo.rndLlegada;
+        filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
       }
-      
 
-
-       if (eventoProximo instanceof EventoInicializacion) {
-        filaDatos.tiempoActual=datos.tiempoActual;
-         filaDatos.ProximotiempoEntreLlegadas = eventoProximo.tiempoEntreLlegadas;
-         filaDatos.rndProximaLlegada = eventoProximo.rndLlegada;
-         filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
-       }
-
-       if (eventoProximo instanceof EventoFinCobro) {
-        filaDatos.tiempoActual=eventoProximo.tiempoDeOcurrenciaFinCobro;
+      if (eventoProximo instanceof EventoFinCobro) {
+        filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaFinCobro;
         filaDatos.tCobro = 2;
-        filaDatos.finCobro=eventoProximo.tiempoProximaOcurrenciaFinCobro;
-        filaDatos.tarifaAuto=eventoProximo.auto.costo;
-       }
-
-      console.log("hasta aca fila", filaDatos);
-
-      if (fila >= this.FILA_A_SIMULAR_DESDE && fila < this.FILA_A_SIMULAR_DESDE + this.CANTIDAD_FILAS_A_MOSTRAR) {
-        this.resultados.push({ ...filaDatos, nroFila: fila });
-        this.totalAutosPagaron=datos.totalAutosPagaron;
-        this.totalRecaudacion=datos.totalRecaudacion;
+        filaDatos.finCobro = eventoProximo.tiempoProximaOcurrenciaFinCobro;
+        filaDatos.tarifaAuto = eventoProximo.auto.costo;
       }
-      datos.tiempoActual = eventoProximo.tiempoDeOcurrencia; // Actualiza el tiempo al tiempo de ocurrencia del evento
+
+      if (datos.tiempoActual >= this.MOSTRAR_DESDE_HORA * 60 && datos.tiempoActual < this.MOSTRAR_HASTA_HORA * 60 && eventoProximo.tiempoDeOcurrencia < this.MOSTRAR_HASTA_HORA * 60) {
+        this.resultados.push({ ...filaDatos, nroFila: this.resultados.length });
+        this.totalAutosPagaron = datos.totalAutosPagaron;
+        this.totalRecaudacion = datos.totalRecaudacion;
+      }
+
+      datos.tiempoActual = eventoProximo.tiempoDeOcurrencia;
     }
+  }else {
+       //SIMULACION POR FILAS
+       for (let fila = 0; fila < this.CANTIDAD_DE_FILAS_A_SIMULAR; fila++) {
+        const eventoProximo = this.extraerEventoProximo(datos);
+  
+        eventoProximo.ocurreEvento(datos);
+  
+        const utilitariosParcialmenteLibres = datos.lugaresDeEstacionamiento.filter(
+          lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 1
+        ).length;
+        const utilitariosLibres = datos.lugaresDeEstacionamiento.filter(
+          lugar => lugar.tamanoActual === 'utilitario' && lugar.ocupados === 0
+        ).length;
+        const grandesLibres = datos.lugaresDeEstacionamiento.filter(
+          lugar => lugar.tamanoActual === 'grande' && lugar.ocupados === 0
+        ).length;
+        const pequeñosLibres = datos.lugaresDeEstacionamiento.filter(
+          lugar => lugar.tamanoActual === 'pequeño' && lugar.ocupados === 0
+        ).length;
+  
+        const autos = datos.autosIngresados.map(auto => {
+          return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual, costo:auto.costo };
+        });
+        const filaCaja = datos.filaCaja.map(auto => {
+          return { nro: auto.nro };
+        });
+        const colaEventos = datos.colaEventos.map(evento => {
+          return { nombre: evento.constructor.name, tiempo: evento.tiempoDeOcurrencia };
+        });
+        // Aquí es donde añadimos el mapeo de autosFinEstacionamiento
+        const autosFinEstacionamiento = datos.autosFinEstacionamiento.map(finEstacionamiento => {
+          return {
+            tiempoDeEstadiaActual: finEstacionamiento.tiempoDeEstadiaActual,
+            tiempoDeLlegada: finEstacionamiento.tiempoDeLlegada,
+            tiempoDeOcurrenciaFinEstacionamientoActual: finEstacionamiento.tiempoDeOcurrenciaFinEstacionamientoActual,
+            auto: {
+              nro: finEstacionamiento.auto.nro,
+              estado: finEstacionamiento.auto.estado,
+              tamanoActual: finEstacionamiento.auto.tamanoActual,
+              costo:finEstacionamiento.auto.costo,
+            }
+          };
+        });
+        
+  
+        if (eventoProximo.tiempoDeOcurrencia > this.CANTIDAD_DE_FILAS_A_SIMULAR * 60) {
+          break;
+        }
+  
+        // this.mostrarDatos(eventoProximo, datos);
+  
+        const filaDatos = {
+          evento: eventoProximo.constructor.name,
+          nroAuto: eventoProximo.auto?.nro || ' ', // Obtenemos nroAuto si existe
+          tiempoActual: eventoProximo.tiempoActual,
+          estadoCajero: datos.cajaOcupada ? 'ocupada' : 'libre',
+          filaCaja: [...datos.filaCaja],
+          utilitariosParcialmenteLibres: utilitariosParcialmenteLibres,
+          utilitariosLibres: utilitariosLibres,
+          grandesLibres: grandesLibres,
+          pequeñosLibres: pequeñosLibres,
+          autos: autos,
+          eventosCola: colaEventos,
+          autosFinEstacionamiento: [...datos.autosFinEstacionamiento],
+          
+          cantAutosIngresados: datos.cantAutosIngresados,
+          totalAutosPagaron: datos.totalAutosPagaron,
+          proximaLlegada: eventoProximo.proximaLlegada || null,
+          rndProximaLlegada: eventoProximo.rndProximaLlegada,
+          ProximotiempoEntreLlegadas: eventoProximo.ProximotiempoEntreLlegadas,
+          proximaLlegada: eventoProximo.proximaLlegada,
+          rndTamanoActual: eventoProximo.rndTamanoActual,
+          tamanoActual: eventoProximo.tamanoActual,
+          //rndTiempoProxFinEstacionamiento: eventoProximo.rndTiempoProxFinEstacionamiento,
+          //tiempoDeEstadiaProxFinEstacionamiento: eventoProximo.tiempoDeEstadiaProxFinEstacionamiento,
+          //tiempoDeOcurrenciaFinEstacionamiento: eventoProximo.tiempoDeOcurrenciaFinEstacionamiento,
+          //rndFinEstacionamientoActual: eventoProximo.rndFinEstacionamientoActual,
+          //tiempoDeEstadiaActual: eventoProximo.tiempoDeEstadiaActual,
+          //tiempoDeOcurrenciaFinEstacionamientoActual: eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual,
+          tiempoDeLlegada: eventoProximo.tiempoDeLlegada,
+          nroFila: fila,
+          tarifaAuto:0,
+          totalRecaudacion:datos.totalRecaudacion,
+          
+          //rndProximoFinEstacionamiento:eventoProximo.rndProximoFinEstacionamiento,
+        };
+  
+  
+        if (eventoProximo instanceof EventoFinEstacionamiento) {
+          filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
+          filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
+          filaDatos.nroAuto = eventoProximo.auto.nro; // Obtener el número de auto
+        
+          // Evento cobro
+          filaDatos.tCobro = 2; // Asumiendo que tCobro es una constante
+          filaDatos.finCobro = eventoProximo.finCobro; // Obtener el tiempo de cobro
+          filaDatos.tarifaAuto=eventoProximo.auto.costo;
+        }
+        
+        
+        
+  
+        if (eventoProximo instanceof EventoLlegadaAuto) {
+          filaDatos.nroAuto = eventoProximo.auto.nro; // Accede al número de auto correctamente
+          filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaLlegadaActual;
+          filaDatos.rndProximaLlegada = eventoProximo.rndProximaLlegada;
+          filaDatos.ProximotiempoEntreLlegadas = eventoProximo.ProximotiempoEntreLlegadas;
+          filaDatos.proximaLlegada = eventoProximo.tiempoProximaOcurrencia;
+          filaDatos.rndTamanoActual = eventoProximo.rndTamanoActual;
+          filaDatos.tamanoActual = eventoProximo.tamanoActual;
+          filaDatos.tarifaAuto=eventoProximo.auto.costo;
+  
+          // Crea EventoFinEstacionamiento
+          filaDatos.rndProximoFinEstacionamiento = eventoProximo.rndProximoFinEstacionamiento;
+          filaDatos.tiempoDeEstadiaProxFinEstacionamiento = eventoProximo.tiempoDeEstadia;
+          filaDatos.tiempoDeLlegada = eventoProximo.tiempoActual; // Ajuste necesario
+          filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamiento;
+        }
+        
+      
+        if (eventoProximo instanceof EventoFinEstacionamiento) {
+          filaDatos.tiempoActual = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
+          filaDatos.tiempoDeOcurrenciaFinEstacionamiento = eventoProximo.tiempoDeOcurrenciaFinEstacionamientoActual;
+          filaDatos.nroAuto = eventoProximo.auto.nro; // Obtener el número de auto
+        
+          console.log("TIEMPO:", filaDatos.tiempoDeOcurrenciaFinEstacionamiento);
+          console.log("NRO AUTO:", filaDatos.nroAuto);
+        }
+        
+  
+  
+         if (eventoProximo instanceof EventoInicializacion) {
+          filaDatos.tiempoActual=datos.tiempoActual;
+           filaDatos.ProximotiempoEntreLlegadas = eventoProximo.tiempoEntreLlegadas;
+           filaDatos.rndProximaLlegada = eventoProximo.rndLlegada;
+           filaDatos.proximaLlegada = eventoProximo.proximaLlegada;
+         }
+  
+         if (eventoProximo instanceof EventoFinCobro) {
+          filaDatos.tiempoActual=eventoProximo.tiempoDeOcurrenciaFinCobro;
+          filaDatos.tCobro = 2;
+          filaDatos.finCobro=eventoProximo.tiempoProximaOcurrenciaFinCobro;
+          filaDatos.tarifaAuto=eventoProximo.auto.costo;
+         }
+  
+        console.log("hasta aca fila", filaDatos);
+  
+        if (fila >= this.FILA_A_SIMULAR_DESDE && fila < this.FILA_A_SIMULAR_DESDE + this.CANTIDAD_FILAS_A_MOSTRAR) {
+          this.resultados.push({ ...filaDatos, nroFila: fila });
+          this.totalAutosPagaron=datos.totalAutosPagaron;
+          this.totalRecaudacion=datos.totalRecaudacion;
+        }
+        datos.tiempoActual = eventoProximo.tiempoDeOcurrencia; // Actualiza el tiempo al tiempo de ocurrencia del evento
+      }
   }
+
+
+  }
+
 
   extraerEventoProximo(datos) {
     let eventoMasCercano = datos.colaEventos[0];
