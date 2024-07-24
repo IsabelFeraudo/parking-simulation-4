@@ -8,9 +8,9 @@ const SimForm = ({ onSubmit }) => {
     filaASimularDesde: 0,
     cantidadFilasAMostrar: 10,
     //horas
-    cantidadHorasASimular: 5,
+    cantidadHorasASimular: 0,
     mostrarDesdeHora: 0,
-    mostrarHastaHora: 5,
+    mostrarHastaHora: 0,
     //modo simulacion
     modoSimulacion: 'filas' // Puede ser 'filas' o 'horas'
   });
@@ -33,7 +33,7 @@ const SimForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formValues.modoSimulacion === 'horas' && (formValues.cantidadHorasASimular <= 0 || formValues.mostrarDesdeHora < 0 || formValues.mostrarHastaHora > 24 || formValues.mostrarDesdeHora >= formValues.mostrarHastaHora)) {
+    if (formValues.modoSimulacion === 'horas' && (formValues.cantidadHorasASimular <= 0 || formValues.mostrarDesdeHora < 0 || formValues.mostrarHastaHora > 100000 || formValues.mostrarDesdeHora >= formValues.mostrarHastaHora)) {
       alert("Por favor, ingrese valores válidos para la simulación por horas.");
       return;
     }
@@ -102,13 +102,13 @@ const SimForm = ({ onSubmit }) => {
               <Col>
                 <Form.Group controlId="mostrarDesdeHora">
                   <Form.Label>Mostrar Desde Hora</Form.Label>
-                  <Form.Control type="number" name="mostrarDesdeHora" value={formValues.mostrarDesdeHora} onChange={handleChange} min="0" max="24" />
+                  <Form.Control type="number" name="mostrarDesdeHora" value={formValues.mostrarDesdeHora} onChange={handleChange} min="0" max="10000" />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group controlId="mostrarHastaHora">
                   <Form.Label>Mostrar Hasta Hora</Form.Label>
-                  <Form.Control type="number" name="mostrarHastaHora" value={formValues.mostrarHastaHora} onChange={handleChange} min="0" max="24" />
+                  <Form.Control type="number" name="mostrarHastaHora" value={formValues.mostrarHastaHora} onChange={handleChange} min="0" max="10000" />
                 </Form.Group>
               </Col>
             </Row>

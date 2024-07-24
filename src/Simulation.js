@@ -10,12 +10,13 @@ const valoresUsuario = {
 };
 
 class Auto {
-  constructor(tamanoActual, nro, estado, lugar, costo) {
+  constructor(tamanoActual, nro, estado, lugar, costo,tiempoFinEstacionamiento) {
     this.nro = nro
     this.tamanoActual = tamanoActual // pequeño
     this.estado = estado // estacionado, esperando pagar, pagando
     this.lugar = lugar // { tipo: grande }
     this.costo = costo
+    this.tiempoFinEstacionamiento=tiempoFinEstacionamiento
   }
 }
 
@@ -63,7 +64,7 @@ class Simulation {
       lugar => lugar.tamanoActual === 'pequeño' && lugar.ocupados === 1
     ).length;
     const autos = datos.autosIngresados.map(auto => {
-      return { nro: auto.nro, estado: auto.estado };
+      return { nro: auto.nro, estado: auto.estado, tiempoFinEstacionamiento:auto.tiempoFinEstacionamiento };
     });
     const filaCaja = datos.filaCaja.map(auto => {
       return { nro: auto.nro };
@@ -161,7 +162,7 @@ class Simulation {
       ).length;
 
       const autos = datos.autosIngresados.map(auto => {
-        return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual, costo:auto.costo };
+        return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual, costo:auto.costo,tiempoFinEstacionamiento:auto.tiempoFinEstacionamiento };
       });
       const filaCaja = datos.filaCaja.map(auto => {
         return { nro: auto.nro };
@@ -285,7 +286,7 @@ class Simulation {
         ).length;
   
         const autos = datos.autosIngresados.map(auto => {
-          return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual, costo:auto.costo };
+          return { nro: auto.nro, estado: auto.estado, tamanoActual: auto.tamanoActual, costo:auto.costo,tiempoFinEstacionamiento:auto.tiempoFinEstacionamiento };
         });
         const filaCaja = datos.filaCaja.map(auto => {
           return { nro: auto.nro };
@@ -520,7 +521,7 @@ class EventoLlegadaAuto {
 
 
     const autoQueLlega = new Auto(this.tamanoActual, this.costo);
-
+    
     // Lógica de estacionamiento (sin cambios)
     if (autoQueLlega.tamanoActual === 'grande') {
       for (let i = 0; i < datos.lugaresDeEstacionamiento.length; i++) {
@@ -583,11 +584,12 @@ class EventoLlegadaAuto {
     auto: {
       nro: this.auto.nro,
       estado: this.auto.estado,
-      tamanoActual: this.auto.tamanoActual
+      tamanoActual: this.auto.tamanoActual,
+      tiempoFinEstacionamiento:this.tiempoDeOcurrenciaFinEstacionamiento,
     }
   });
   console.log("TIEMPO ESTACIONAMIENTO",this.tiempoDeOcurrenciaFinEstacionamiento)
-
+  autoQueLlega.tiempoFinEstacionamiento=this.tiempoDeOcurrenciaFinEstacionamiento;
       datos.colaEventos.push(new EventoFinEstacionamiento(this.rndProximoFinEstacionamiento, this.tiempoDeEstadiaActual, this.tiempoDeOcurrencia, this.tiempoDeOcurrenciaFinEstacionamiento, autoQueLlega));
     }
 
@@ -631,6 +633,7 @@ class EventoFinEstacionamiento {
   }
 
   ocurreEvento(datos) {
+    this.auto.tiempoFinEstacionamiento=this.tiempoDeOcurrenciaFinEstacionamiento;
 
     datos.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
     this.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
@@ -685,6 +688,10 @@ class EventoFinCobro {
   }
 
   ocurreEvento(datos) {
+    // Actualizar el estado del sistema
+    datos.totalAutosPagaron++;
+    this.totalAutosPagaron=datos.totalAutosPagaron;
+    datos.totalRecaudacion += this.auto.costo;
     datos.finCobro=this.tiempoDeOcurrencia;
     datos.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
     this.proximaLlegada=obtenerMayorTiempoDeOcurrencia(datos);
@@ -697,14 +704,22 @@ class EventoFinCobro {
     // 2. Buscar el auto que haya llegado a la caja primero (menor tiempo de fin de estacionamiento)
     let autosEsperando = datos.autosIngresados.filter(auto => auto.estado === "esperando pagar");
     let autoPrioritario = null;
-
-    if (autosEsperando.length > 0) {
-      autoPrioritario = autosEsperando.reduce((prev, curr) => (prev.tiempoFinEstacionamiento < curr.tiempoFinEstacionamiento ? prev : curr));
-    }
-
+console.log("autose esperando",autosEsperando )
+    
+// if (autosEsperando.length > 0) {
+//       autoPrioritario = autosEsperando.reduce((prev, curr) => (prev.tiempoFinEstacionamiento < curr.tiempoFinEstacionamiento ? prev : curr));
+//     }
+//     console.log("autose prio",autoPrioritario )
+    
+if (autosEsperando.length > 0) {
+  const menorTiempoFin = Math.min(...autosEsperando.map(auto => auto.tiempoFinEstacionamiento));
+  autoPrioritario = autosEsperando.find(auto => auto.tiempoFinEstacionamiento === menorTiempoFin);
+  console.log("autosEsperando",autosEsperando)
+}console.log("autose prio",autoPrioritario )
     if (autoPrioritario) {
       // Cambiar el estado del auto a "pagando"
       autoPrioritario.estado = "pagando";
+      console.log("ACCAAAAA")
       
           // Si había un auto esperando en la cola de la caja, se debe quitar de la fila de caja
     let indicePrioritario = datos.filaCaja.findIndex(auto => auto.nro === this.auto.nro);
@@ -712,10 +727,9 @@ class EventoFinCobro {
       datos.filaCaja.splice(indicePrioritario, 1);
     }
 
-      // Actualizar el estado del sistema
-      datos.totalAutosPagaron++;
-      datos.totalRecaudacion += autoPrioritario.costo;
-      this.tiempoProximaOcurrenciaFinCobro=this.tiempoDeOcurrencia;
+      
+      //this.totalRecaudacion=autoPrioritario.costo;
+      //this.tiempoProximaOcurrenciaFinCobro=this.tiempoDeOcurrencia;
       // Crear un nuevo evento si hay más autos en la cola de la caja
       if (datos.filaCaja.length > 0) {
         // Verificar si ya existe un evento fin de cobro en la cola de eventos
@@ -724,7 +738,7 @@ class EventoFinCobro {
         
         if (!existeEventoFinCobro) {
           // Solo se crea un nuevo EventoFinCobro si no hay uno ya en la cola de eventos
-          this.tiempoProximaOcurrenciaFinCobro = this.tiempoDeOcurrencia + 2;
+          this.tiempoProximaOcurrenciaFinCobro = this.tiempoDeOcurrencia+2;
           datos.finCobro=this.tiempoProximaOcurrenciaFinCobro;
           const proximoAuto = datos.filaCaja[0]; // Obtener el primer auto de la fila sin removerlo
          // datos.colaEventos.push(new EventoFinCobro(this.tiempoProximaOcurrenciaFinCobro, proximoAuto));
@@ -736,6 +750,9 @@ class EventoFinCobro {
     } else {
       datos.cajaOcupada = false; // Si no hay autos esperando, la caja pasa a estar libre
     }
+
+    console.log(`Total Autos Pagaron: ${datos.totalAutosPagaron}`);
+console.log(`Total Recaudacion: ${datos.totalRecaudacion}`);
   }
 }
 
