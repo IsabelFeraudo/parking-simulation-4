@@ -1,3 +1,24 @@
+// import { CANTIDAD_DE_FILAS_A_SIMULAR, CANTIDAD_HORAS_A_SIMULAR } from './components/SimulacionFormulario'
+
+// lugaresDeEstacionamiento = [
+//    { tipo: utilitario, ocupados: 0 },
+//    { tipo: utilitario, ocupados: 0 },
+//    { tipo: peque, ocupados: 0 }
+// ]
+
+// FinDeEstadia: auto35
+// auto35 = { tamaño: peque, lugar: Lugar1{ tipo: utilitario, ocupados: 1 } }
+// auto36 = { tamaño: peque, lugar: Lugar1{ tipo: utilitario, ocupados: 2 } }
+//
+// auto35 = { tamaño: peque, lugar: { tipo: utilitario, ocupados: 0 } }
+//
+// auto35 = { tamaño: peque, lugar: null }
+
+// LlegadaVehiculo: auto36
+// auto36 = { tamaño: utilitario, lugar: { tipo: utilitario, ocupados: 0 }, }
+
+// auto35 = { tamaño: peque, lugar: null }
+
 //NOTAS:
 //NUNCA HAY UTILITARIOS PARCIALMENTE LIBRES
 //NO SE MUESTRAN LOS ACUMULADORES
@@ -24,13 +45,13 @@ class Lugar {
 }
 
 class Simulation {
-  constructor(cantidadFilasASimular, filaASimularDesde,cantidadFilasAMostrar,cantidadHorasASimular,horaASimularDesde,cantidadHorasAMostrar) {
+  constructor(cantidadFilasASimular, filaASimularDesde, cantidadFilasAMostrar,cantidadHorasASimular, mostrarDesdeHora,mostrarHastaHora ) {
     this.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadFilasASimular;
     this.FILA_A_SIMULAR_DESDE = filaASimularDesde;
     this.CANTIDAD_FILAS_A_MOSTRAR = cantidadFilasAMostrar;
-    this.CANTIDAD_DE_FILAS_A_SIMULAR = cantidadHorasASimular;
-    this.FILA_A_SIMULAR_DESDE = horaASimularDesde;
-    this.CANTIDAD_FILAS_A_MOSTRAR = cantidadHorasAMostrar;
+    this.CANTIDAD_DE_HORAS_A_SIMULAR= cantidadHorasASimular;
+    this.MOSTRAR_DESDE_HORA=mostrarDesdeHora;
+    this.MOSTRAR_HASTA_HORA=mostrarHastaHora;
     this.resultados = [];
     this.totalAutosPagaron=0;
     this.totalRecaudacion=0;

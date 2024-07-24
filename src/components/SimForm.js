@@ -3,12 +3,15 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 
 const SimForm = ({ onSubmit }) => {
   const [formValues, setFormValues] = useState({
+    //filas
     cantidadFilasASimular: 20,
     filaASimularDesde: 0,
     cantidadFilasAMostrar: 100,
+    //horas
     cantidadHorasASimular: 0,
     mostrarDesdeHora: 0,
-    mostrarHastaHora: 24,
+    mostrarHastaHora: 100,
+    //modo simulacion
     modoSimulacion: 'filas' // Puede ser 'filas' o 'horas'
   });
 
